@@ -127,7 +127,7 @@ module Restaurant
   ###############
     def get_customer(id)
       command = <<-SQL
-      SELECT * FROM Customers
+      SELECT * FROM customers
       WHERE id = '#{id}';
       SQL
 
@@ -136,7 +136,7 @@ module Restaurant
 
     def create_customer(name)
       command = <<-SQL
-      INSERT INTO Customers (name)
+      INSERT INTO customers (name)
       VALUES ('#{name}')
       RETURNING *;
       SQL
@@ -148,7 +148,7 @@ module Restaurant
   # #####################
     def add_shopping_cart(customer_id)
       command = <<-SQL
-      INSERT INTO ShoppingCart (customer_id)
+      INSERT INTO shopping_cart (customer_id)
       VALUES ('#{customer_id}')
       RETURNING *;
       SQL
@@ -161,52 +161,61 @@ module Restaurant
     def get_shopping_cart(scid)
       command = <<-SQL
       SELECT *
-      FROM ShoppingCart
-      WHERE SCID = '#{scid}';
+      FROM shopping_cart
+      WHERE id = '#{scid}';
       SQL
 
-      @db_adaptor.exec(command)
+      @db_adaptor.exec(command).values[0]
     end
 
     def add_food_item (scid, fid, quantity)
-      <<-SQL
-      INSERT INTO ShoppingCartFood (SCID, item_id, item_quantity)
+      command = <<-SQL
+      INSERT INTO shopping_cart_food (SCID, item_id, item_quantity)
       VALUES ('#{scid}', '#{fid}', '#{quantity}');
       SQL
+#RETURNING* in order to show the deleted item
 
+      @db_adaptor.exec(command)
       true
     end
 
     def remove_food_item (scid, fid)
-      <<-SQL
-      DELETE * FROM ShoppingCartFood
+      command = <<-SQL
+      DELETE
+      FROM shopping_cart_food
       WHERE SCID = '#{scid}' AND item_id = '#{fid}';
       SQL
+
+      @db_adaptor.exec(command)
+#RETURNING* in order to return the deleted item
+      true
     end
 
     def list_items_in_shopping_cart(scid)
       command = <<-SQL
-      SELECT f.id, f.name, f.price, f.category, f.type_of_item
-      FROM ShoppingCartFood AS scf
-      JOIN Food AS f
+      SELECT f.id, f.name, f.price, f.category, f.type_of_item, scf.item_quantity
+      FROM shopping_cart_food AS scf
+      JOIN food AS f
       ON scf.item_id = f.id
       WHERE scf.scid= '#{scid}';
       SQL
+
+      #code works but does not allocate the quantity of the food
 
       @db_adaptor.exec(command).values
     end
 
     def shopping_cart_item_prices(scid)
       command = <<-SQL
-      SELECT f.price
-      FROM ShoppingCartFood AS scf
-      JOIN Food AS f
+      SELECT f.price, scf.item_quantity
+      FROM shopping_cart_food AS scf
+      JOIN food AS f
       ON scf.item_id = f.id
       WHERE scf.scid = '#{scid}';
       SQL
 
       @db_adaptor.exec(command).values
-      #return an array of the prices
+      #returns an array of prices and quantity of each item
     end
 
 
@@ -219,48 +228,48 @@ module Restaurant
   # ###########
   # #Menu Class
   # ###########
-  #   def get_menu(id)
-  #     command <<-SQL
-  #     SELECT * FROM Menus
-  #     WHERE id = '#{id}';
-  #     SQL
+    def get_menu(id)
+      command <<-SQL
+      SELECT * FROM Menus
+      WHERE id = '#{id}';
+      SQL
 
-  #     @db_adaptor.exec(command).values
-  #   end
+      @db_adaptor.exec(command).values
+    end
 
-  #   def add_menu(name)
-  #     command <<-SQL
-  #     INSERT INTO Menus (name)
-  #     VALUES ('#{name}')
-  #     RETURNING *;
-  #     SQL
+    def add_menu(name)
+      command <<-SQL
+      INSERT INTO Menus (name)
+      VALUES ('#{name}')
+      RETURNING *;
+      SQL
 
-  #     @db_adaptor.exec(command).values[0]
-  #   end
+      @db_adaptor.exec(command).values[0]
+    end
 
-  #   def get_food_items(mid,category)
-  #     command = <<-SQL
-  #       SELECT f.id, f.name, f.price, f.category, f.type_of_item
-  #       FROM MenusFood AS mf
-  #       JOIN Food AS f
-  #       ON mf.food_id = f.id
-  #       WHERE mf.menu_id = '#{mid}' AND f.category = '#{category}'
-  #     SQL
+    def get_food_items(mid,category)
+      command = <<-SQL
+        SELECT f.id, f.name, f.price, f.category, f.type_of_item
+        FROM MenusFood AS mf
+        JOIN Food AS f
+        ON mf.food_id = f.id
+        WHERE mf.menu_id = '#{mid}' AND f.category = '#{category}'
+      SQL
 
-  #     @db_adaptor.exec(command).values
-  #   end
+      @db_adaptor.exec(command).values
+    end
 
-  #   def get_beverages(mid, category)
-  #     command = <<-SQL
-  #     SELECT f.id, f.name, f.price, f.category, f.type_of_item
-  #     FROM MenusFood AS mf
-  #     JOIN Food AS f
-  #     ON mf.food_id = f.id
-  #     WHERE mf.menu_id = '#{mid}' AND f.category = '#{category}' AND f.type_of_item = 'beverage'
-  #     SQL
+    def get_beverages(mid, category)
+      command = <<-SQL
+      SELECT f.id, f.name, f.price, f.category, f.type_of_item
+      FROM MenusFood AS mf
+      JOIN Food AS f
+      ON mf.food_id = f.id
+      WHERE mf.menu_id = '#{mid}' AND f.category = '#{category}' AND f.type_of_item = 'beverage'
+      SQL
 
-  #     @db_adaptor.exec(command).values
-  #   end
+      @db_adaptor.exec(command).values
+    end
 
   # ############
   # #Order Class

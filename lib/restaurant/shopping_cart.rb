@@ -36,7 +36,7 @@ class Restaurant::Shopping_Cart
     end
 
     items #returns an array of food items
-    #how to list the quantity of food items?
+    #how to list the quantity of food items? look at change in orm to adjust for quantity
   end
 
   # def increase_quantity_of_item(fid)
@@ -49,7 +49,7 @@ class Restaurant::Shopping_Cart
   #return an array of the list items price
     result = Restaurant.orm.shopping_cart_item_prices(@id)
     total = result.each {|price| sum += price}
-    total
+    total #changed how it's returned in orm
   end
 
   def submit(customer_id) #allows the customer to submit order to restaurant staff
