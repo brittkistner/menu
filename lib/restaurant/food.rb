@@ -18,7 +18,7 @@ class Restaurant::Food
   def self.add_food(name, price, category, type_of_item)
     result = Restaurant.orm.create_food(name,price,category, type_of_item)
     Restaurant::Food.new(result[0],result[1],result[2],result[3], result[4])
-  end,
+  end
 
   def self.remove_food(id)
     Restaurant.orm.remove_food(id)

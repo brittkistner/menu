@@ -2,12 +2,12 @@ require 'spec_helper.rb'
 require 'pry-byebug'
 
 describe 'Menu::Order' do
-  it 'exists' do
+  xit 'exists' do
     expect(Menu::Order).to be_a(Class)
   end
 
   describe '#initialize' do
-    it 'has a creation time' do
+    xit 'has a creation time' do
     end
   end
 

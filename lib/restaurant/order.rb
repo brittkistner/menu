@@ -44,4 +44,28 @@ class Restaurant::Order
 
     items
   end
+
+  def self.list_open_orders
+    result = Restaurant.orm.list_open_orders
+    open_orders = []
+
+    result.each do |open_order|
+      open_orders << Restaurant::Order.new(open_order[0],open_order[1],open_order[2],open_order[3])
+    end
+    open_orders
+  end
+
+  def self.list_closed_orders
+    result = Restaurant.orm.list_closed_orders
+    closed_orders = []
+
+    result.each do |order|
+      closed_orders << Restaurant::Order.new(order[0],order[1],order[2],order[3])
+    end
+    closed_orders
+  end
+
+  def self.complete_order(id)
+    Restaurant.orm.mark_complete(id)
+  end
 end
