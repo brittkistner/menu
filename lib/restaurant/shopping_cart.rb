@@ -32,7 +32,7 @@ class Restaurant::Shopping_Cart
     items = []
 
     result.each do |item|
-      items << Restaurant::Food.new(item[0], item[1], item[2], item[3]) #FINISH
+      items << Restaurant::Food.new(item[0], item[1], item[2], item[3], item[4])
     end
 
     items #returns an array of food items

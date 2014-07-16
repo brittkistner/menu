@@ -1,13 +1,13 @@
 class Restaurant::Food
 
-  attr_reader :id, :name, :price, :category
+  attr_reader :id, :name, :price, :category, :type_of_item
 
-  def initialize(id, name, price, category)
+  def initialize(id, name, price, category, type_of_item)
     @id = id
     @name = name
     @price =price
     @category = category
-    # @type_of_item = type_of_item
+    @type_of_item
   end
 
   def self.get(id)
@@ -15,9 +15,9 @@ class Restaurant::Food
     Restaurant::Food.new(result[0],result[1],result[2],result[3])
   end
 
-  def self.add_food(name, price, category)#look at initialize)
-    result = Restaurant.orm.create_food(name,price,category)
-    Restaurant::Food.new(result[0],result[1],result[2],result[3])
+  def self.add_food(name, price, category, type_of_item)#look at initialize)
+    result = Restaurant.orm.create_food(name,price,category, type_of_item)
+    Restaurant::Food.new(result[0],result[1],result[2],result[3], result[4])
   end,
 
   def self.remove_food(id)
@@ -30,7 +30,7 @@ class Restaurant::Food
     list = []
 
     result.each do |item|
-      list << Restaurant::Food.new(item[0],result[1],result[2],result[3])
+      list << Restaurant::Food.new(item[0],result[1],result[2],result[3],result[4])
     end
 
     list

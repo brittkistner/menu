@@ -16,7 +16,8 @@ class Restaurant::Orm
       PRIMARY KEY (id),
       name TEXT,
       price INTEGER,
-      category TEXT
+      category TEXT,
+      type_of_item TEXT
       );
     CREATE TABLE IF NOT EXISTS Customers(
       id SERIAL,
@@ -41,6 +42,15 @@ class Restaurant::Orm
      CREATE TABLE IF NOT EXISTS Customers(
       id = SERIAL,
       PRIMARY KEY (id)
+      );
+     CREATE TABLE IF NOT EXISTS Menus(
+      id = SERIAL,
+      PRIMARY KEY (id),
+      name = TEXT
+      );
+     CREATE TABLE IF NOT EXISTS MenusFood(
+      menu_id = INTEGER REFERENCES Menus(id),
+      food_id = INTEGER REFERENCES Food(id)
       );
     SQL
 
@@ -78,8 +88,8 @@ class Restaurant::Orm
 
   def create_food(name, price, category)
     command = <<-SQL
-    INSERT INTO Food (name, price, category)
-    VALUES ('#{name}', '#{price}', '#{category}')
+    INSERT INTO Food (name, price, category, type_of_item)
+    VALUES ('#{name}', '#{price}', '#{category}', '#{type_of_item}')
     RETURNING *;
     SQL
 
@@ -161,11 +171,12 @@ def remove_food_item (scid, fid)
   <<-SQL
   DELETE * FROM ShoppingCartFood
   WHERE SCID = '#{scid}' AND item_id = '#{fid}';
+  SQL
 end
 
 def list_items_in_shopping_cart(scid)
   command = <<-SQL
-  SELECT f.id, f.name, f.price, f.category
+  SELECT f.id, f.name, f.price, f.category, f.type_of_item
   FROM ShoppingCartFood AS scf
   JOIN Food AS f
   ON scf.item_id = f.id
@@ -195,12 +206,35 @@ end
   # # def decrease_quantity_of_item(fid)
   # # end
 
-  # def get_food_items(category)
-  #   command = <<-SQL
-  #     SELECT * FROM Food
-  #     WHERE category = '#{category}'
-  #   SQL
+#Menu Class
 
-  #   @db_adaptor.exec(command).values
-  # end
+def get_menu(id)
+  command <<-SQL
+  SELECT * FROM Menus
+  WHERE id = '#{id}';
+  SQL
+
+  @db_adaptor.exec(command).values
+end
+
+def add_menu(name)
+  command <<-SQL
+  INSERT INTO Menus (id, name)
+  VALUES ('#{name}')
+  RETURNING *;
+  SQL
+
+  @db_adaptor.exec(command).values[0]
+end
+
+def get_food_items(mid)
+  command = <<-SQL
+    SELECT f.id, f.name, f.price, f.category, f.type_of_item
+    FROM MenusFood AS mf
+    JOIN Food AS f
+    ON mf.food_id = f.id
+    WHERE mf.menu_id = '#{mid}' AND f.category = '#{category}'
+  SQL
+
+  @db_adaptor.exec(command).values
 end

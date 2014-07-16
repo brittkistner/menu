@@ -19,11 +19,19 @@ class Restaurant::Menu
   end
 
   def get_food_items(category) #brings back info for all food items for a particular category in no particular order
-    result = Restaurant.orm.get_food_items(category)
-    menu = Restuarant::Menu.new(result[1], result[2])#enter needed info)
-    menu
+    result = Restaurant.orm.get_food_items(@id, category)
+    items = []
 
-    #return a menu instance, would like to add categories (beverages, apps, etc to the menu instance)
+    result.each do |item|
+      items << Restaurant::Food.new(item[0], item[1], item[2], item[3], item[4])
+    end
+
+    items #returns an array of food items
+  end
+
+  def get_beverages(category)
+    get_food_items(category) #return the items array
+
   end
 
 end
