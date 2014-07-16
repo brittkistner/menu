@@ -18,7 +18,8 @@ module Restaurant
         id SERIAL,
         customer_id INTEGER REFERENCES Customers(id),
         PRIMARY KEY (id),
-        creation_time TIMESTAMP
+        creation_time TIMESTAMP,
+        status TEXT
         );
       CREATE TABLE IF NOT EXISTS Food(
         id SERIAL,
@@ -113,7 +114,9 @@ module Restaurant
       @db_adaptor.exec(command).values
     end
 
+  ###############
   #Customer Class
+  ###############
     def get_customer(id)
       command = <<-SQL
       SELECT * FROM Customers
@@ -132,9 +135,9 @@ module Restaurant
 
       @db_adaptor.exec(command).values[0]
     end
-
+  #####################
   #Shopping Cart Class
-
+  #####################
     def add_shopping_cart(customer_id)
       command = <<-SQL
       INSERT INTO ShoppingCart (customer_id)
@@ -205,8 +208,9 @@ module Restaurant
       # # def decrease_quantity_of_item(fid)
       # # end
 
+  ###########
   #Menu Class
-
+  ###########
     def get_menu(id)
       command <<-SQL
       SELECT * FROM Menus
@@ -218,7 +222,7 @@ module Restaurant
 
     def add_menu(name)
       command <<-SQL
-      INSERT INTO Menus (id, name)
+      INSERT INTO Menus (name)
       VALUES ('#{name}')
       RETURNING *;
       SQL
@@ -250,8 +254,9 @@ module Restaurant
       @db_adaptor.exec(command).values
     end
 
+  ############
   #Order Class
-
+  ############
     def get_order(id)
       command <<-SQL
       SELECT * FROM Orders
@@ -262,9 +267,11 @@ module Restaurant
     end
 
     def add_order(customer_id)
+      status = "open"
+      creation_time = Time.now
       command <<-SQL
-      INSERT INTO Orders (customer_id)
-      VALUES ('#{customer_id}')
+      INSERT INTO Orders (customer_id, creation_time, status)
+      VALUES ('#{customer_id}', '#{creation_time}', '#{status}')
       RETURNING *;
       SQL
 
@@ -290,6 +297,13 @@ module Restaurant
 
       @db_adaptor.exec(command).values
     end
-
-  #Staff Class
   end
+
+  ############
+  #Staff Class
+  ############
+
+  def self.orm
+   @__orm_instance ||= ORM.new
+  end
+end

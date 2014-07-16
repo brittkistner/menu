@@ -4,21 +4,23 @@ require 'time'
 class Restaurant::Order
 
   attr_reader :id, :table_number, :creation_time
+  attr_accessor :status
 
-  def initialize(id, customer_id, creation_time)
+  def initialize(id, customer_id, creation_time, status)
     @id = id
     @customer_id = customer_id
     @creation_time = DateTime.parse(creation_time)
+    @status = status
   end
 
   def self.get(id)
     result = Restaurant.orm.get_order(id)
-    Restaurant::Order.new(result[0], result[1], result[2])
+    Restaurant::Order.new(result[0], result[1], result[2], result[3])
   end
 
   def create_order(customer_id)
     result = Restaurant.orm.add_order(customer_id)
-    order = Restaurant::Order.new(result[0],result[1],result[2])
+    order = Restaurant::Order.new(result[0],result[1],result[2], result[3])
     order
   end
 
@@ -27,7 +29,7 @@ class Restaurant::Order
     orders = []
 
     result.each do |order|
-      orders << Restaurant::Order.new(order[0],order[1],order[2])
+      orders << Restaurant::Order.new(order[0],order[1],order[2], order[3])
     end
 
     orders
