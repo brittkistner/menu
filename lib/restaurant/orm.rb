@@ -279,7 +279,7 @@ module Restaurant
     def add_order(customer_id)
       status = "open"
       creation_time = Time.now
-      command <<-SQL
+      command = <<-SQL
       INSERT INTO Orders (customer_id, creation_time, status)
       VALUES ('#{customer_id}', '#{creation_time}', '#{status}')
       RETURNING *;
@@ -289,12 +289,12 @@ module Restaurant
     end
 
     def get_order(id)
-      command <<-SQL
+      command = <<-SQL
       SELECT * FROM Orders
       WHERE id = '#{id}';
       SQL
 
-      @db_adaptor.exec(command).values
+      @db_adaptor.exec(command).values[0]
     end
 
     def list_orders
@@ -316,12 +316,13 @@ module Restaurant
 
       @db_adaptor.exec(command).values
     end
+    #shopping cart order join table
 
     def list_open_orders
       command = <<-SQL
       SELECT *
       FROM Orders
-      WHERE status = "open";
+      WHERE status = 'open';
       SQL
 
       @db_adaptor.exec(command).values
@@ -331,18 +332,20 @@ module Restaurant
       command = <<-SQL
       SELECT *
       FROM Orders
-      WHERE status = "closed";
+      WHERE status = 'closed';
       SQL
 
       @db_adaptor.exec(command).values
     end
 
     def mark_complete(order_id)
-      <<-SQL
+      command = <<-SQL
       UPDATE Orders
       SET status = 'closed'
       WHERE id = '#{order_id}';
       SQL
+
+      @db_adaptor.exec(command)
 
       true
     end
