@@ -22,7 +22,24 @@ class Restaurant::Order
     order
   end
 
-  #list order
+  def self.list_orders
+    result = Restaurant.orm.list_orders
+    orders = []
 
+    result.each do |order|
+      orders << Restaurant::Order.new(order[0],order[1],order[2])
+    end
 
+    orders
+  end
+
+  def list_items_in_order
+    result = Restaurant.orm.list_items_in_order(@id)
+    items = []
+    result.each do |item|
+      items << Restaurant::Food.new(item[0],item[1],item[2],item[3],item[4])
+    end
+
+    items
+  end
 end

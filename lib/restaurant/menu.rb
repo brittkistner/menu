@@ -26,12 +26,24 @@ class Restaurant::Menu
       items << Restaurant::Food.new(item[0], item[1], item[2], item[3], item[4])
     end
 
-    items #returns an array of food items
+    items #returns an array of food objects
   end
 
   def get_beverages(category)
-    get_food_items(category) #return the items array
+    result = Restaurant.orm.get_beverages(@id, category)
+    items = []
 
+    result.each do |item|
+      items << Restaurant::Food.new(item[0], item[1], item[2], item[3], item[4])
+    end
+
+    items #returns an array of food objects which are of type beverages
+  end
+
+  def get_appetizers(category)
+  end
+
+  def get_entrees(category)
   end
 
 end

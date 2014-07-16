@@ -15,7 +15,7 @@ class Restaurant::Food
     Restaurant::Food.new(result[0],result[1],result[2],result[3])
   end
 
-  def self.add_food(name, price, category, type_of_item)#look at initialize)
+  def self.add_food(name, price, category, type_of_item)
     result = Restaurant.orm.create_food(name,price,category, type_of_item)
     Restaurant::Food.new(result[0],result[1],result[2],result[3], result[4])
   end,
@@ -30,7 +30,7 @@ class Restaurant::Food
     list = []
 
     result.each do |item|
-      list << Restaurant::Food.new(item[0],result[1],result[2],result[3],result[4])
+      list << Restaurant::Food.new(item[0],item[1],item[2],item[3],item[4])
     end
 
     list
