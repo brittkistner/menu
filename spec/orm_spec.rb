@@ -54,4 +54,17 @@ describe 'Orm' do
   end
 
   #####CUSTOMER CLASS#####
+  describe '#create_customer' do
+    it 'adds a tuple to the customer table and returns an array with the customer information' do
+      expect(Restaurant.orm.create_customer("Benny")).to be_a(Array)
+    end
+  end
+
+  describe '#get_customer' do
+    it 'looks up a customer tuple and returns an array with the customer information' do
+      Restaurant.orm.create_customer("Benny")
+      expect(Restaurant.orm.get_customer(1).length).to eq(1)
+    end
+  end
+
 end

@@ -102,7 +102,7 @@ module Restaurant
       WHERE id = '#{id}';
       SQL
 
-      @db_adaptor.exec(command).values
+      @db_adaptor.exec(command).values[0]
     end
 
     def remove_food(id) #rescue??
@@ -122,99 +122,99 @@ module Restaurant
       @db_adaptor.exec(command).values
     end
 
-  # ###############
-  # #Customer Class
-  # ###############
-  #   def get_customer(id)
-  #     command = <<-SQL
-  #     SELECT * FROM Customers
-  #     WHERE id = '#{id}';
-  #     SQL
+  ###############
+  #Customer Class
+  ###############
+    def get_customer(id)
+      command = <<-SQL
+      SELECT * FROM Customers
+      WHERE id = '#{id}';
+      SQL
 
-  #     @db_adaptor.exec(command)
-  #   end
+      @db_adaptor.exec(command).values[0] #returns [id,name]
+    end
 
-  #   def create_customer(name)
-  #     command = <<-SQL
-  #     INSERT INTO Customers (name)
-  #     VALUES ('#{name}')
-  #     RETURNING *;
-  #     SQL
+    def create_customer(name)
+      command = <<-SQL
+      INSERT INTO Customers (name)
+      VALUES ('#{name}')
+      RETURNING *;
+      SQL
 
-  #     @db_adaptor.exec(command).values[0]
-  #   end
+      @db_adaptor.exec(command).values[0] #returns [id,name]
+    end
   # #####################
   # #Shopping Cart Class
   # #####################
-  #   def add_shopping_cart(customer_id)
-  #     command = <<-SQL
-  #     INSERT INTO ShoppingCart (customer_id)
-  #     VALUES ('#{customer_id}')
-  #     RETURNING *;
-  #     SQL
+    def add_shopping_cart(customer_id)
+      command = <<-SQL
+      INSERT INTO ShoppingCart (customer_id)
+      VALUES ('#{customer_id}')
+      RETURNING *;
+      SQL
 
-  #     #customer id?
+      #customer id?
 
-  #     @db_adaptor.exec(command).values[0]
-  #   end
+      @db_adaptor.exec(command).values[0]
+    end
 
-  #   def get_shopping_cart(scid)
-  #     command = <<-SQL
-  #     SELECT *
-  #     FROM ShoppingCart
-  #     WHERE SCID = '#{scid}';
-  #     SQL
+    def get_shopping_cart(scid)
+      command = <<-SQL
+      SELECT *
+      FROM ShoppingCart
+      WHERE SCID = '#{scid}';
+      SQL
 
-  #     @db_adaptor.exec(command)
-  #   end
+      @db_adaptor.exec(command)
+    end
 
-  #   def add_food_item (scid, fid, quantity)
-  #     <<-SQL
-  #     INSERT INTO ShoppingCartFood (SCID, item_id, item_quantity)
-  #     VALUES ('#{scid}', '#{fid}', '#{quantity}');
-  #     SQL
+    def add_food_item (scid, fid, quantity)
+      <<-SQL
+      INSERT INTO ShoppingCartFood (SCID, item_id, item_quantity)
+      VALUES ('#{scid}', '#{fid}', '#{quantity}');
+      SQL
 
-  #     true
-  #   end
+      true
+    end
 
-  #   def remove_food_item (scid, fid)
-  #     <<-SQL
-  #     DELETE * FROM ShoppingCartFood
-  #     WHERE SCID = '#{scid}' AND item_id = '#{fid}';
-  #     SQL
-  #   end
+    def remove_food_item (scid, fid)
+      <<-SQL
+      DELETE * FROM ShoppingCartFood
+      WHERE SCID = '#{scid}' AND item_id = '#{fid}';
+      SQL
+    end
 
-  #   def list_items_in_shopping_cart(scid)
-  #     command = <<-SQL
-  #     SELECT f.id, f.name, f.price, f.category, f.type_of_item
-  #     FROM ShoppingCartFood AS scf
-  #     JOIN Food AS f
-  #     ON scf.item_id = f.id
-  #     WHERE scf.scid= '#{scid}';
-  #     SQL
+    def list_items_in_shopping_cart(scid)
+      command = <<-SQL
+      SELECT f.id, f.name, f.price, f.category, f.type_of_item
+      FROM ShoppingCartFood AS scf
+      JOIN Food AS f
+      ON scf.item_id = f.id
+      WHERE scf.scid= '#{scid}';
+      SQL
 
-  #     @db_adaptor.exec(command).values
-  #   end
+      @db_adaptor.exec(command).values
+    end
 
-  #   def shopping_cart_item_prices(scid)
-  #     command = <<-SQL
-  #     SELECT f.price
-  #     FROM ShoppingCartFood AS scf
-  #     JOIN Food AS f
-  #     ON scf.item_id = f.id
-  #     WHERE scf.scid = '#{scid}';
-  #     SQL
+    def shopping_cart_item_prices(scid)
+      command = <<-SQL
+      SELECT f.price
+      FROM ShoppingCartFood AS scf
+      JOIN Food AS f
+      ON scf.item_id = f.id
+      WHERE scf.scid = '#{scid}';
+      SQL
 
-  #     @db_adaptor.exec(command).values
-  #     #return an array of the prices
-  #   end
+      @db_adaptor.exec(command).values
+      #return an array of the prices
+    end
 
 
-  #     # # def increase_quantity_of_item(fid)
-  #     # # end
+      # # def increase_quantity_of_item(fid)
+      # # end
 
-  #     # # def decrease_quantity_of_item(fid)
-  #     # # end
+      # # def decrease_quantity_of_item(fid)
+      # # end
 
   # ###########
   # #Menu Class
