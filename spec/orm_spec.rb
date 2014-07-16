@@ -151,27 +151,80 @@ describe 'Orm' do
 
   describe '#decrease_quantity_of_item' do
   end
-
-  describe '#get_menu' do
-    it 'looks up a menu tuple by id and returns an array with the menu information' do
+#### MENU CLASS ####
+  describe '#add_menu' do
+    it 'creates a menu given a name and returns an array of menu information' do
+      expect(Restaurant.orm.add_menu("lunch")).to be_a(Array)
     end
   end
 
-  describe '#add_menu' do
-    it 'creates a menu given a name and returns an array of menu information' do
+  describe '#get_menu' do
+    it 'looks up a menu tuple by id and returns an array with the menu information' do
+      Restaurant.orm.add_menu("lunch")
+      expect(Restaurant.orm.get_menu(1).length).to eq(2)
     end
   end
 
   describe '#get_food_items' do
-    it 'lists all food items given a menu id and category of food' do
+    xit 'lists all food items given a menu id and category of food' do
+      Restaurant.orm.add_menu("lunch")
+
+      Restaurant.orm.create_food("hamburger", 10, "lunch", "entree")
+      Restaurant.orm.create_food("burrito", 8, "lunch", "entree")
+      Restaurant.orm.create_food("pancakes", 8, "breakfast", "entree")
+
+      binding.pry
+
+      expect(Restaurant.orm.get_food_items(1,"lunch")).to be_a(Array)
+      expect(Restaurant.orm.get_food_items(1,"lunch").length).to eq(2)
     end
   end
 
   describe '#get_beverages' do
-    it 'lists all beverage items given a menu id and category of food' do
+    xit 'returns an array of all beverage items given a menu id and category of food' do
+      Restaurant.orm.add_menu("lunch")
+
+      Restaurant.orm.create_food("coke", 2, "lunch", "beverage")
+      Restaurant.orm.create_food("burrito", 8, "lunch", "beverage")
+
+      expect(Restaurant.orm.get_beverages(1,"lunch")).to be_a(Array)
+      expect(Restaurant.orm.get_beverages(1,"lunch").length).to eq(2)
+    end
+  end
+#### ORDER CLASS ####
+  describe '#add_order' do
+  end
+
+  describe '#get_order' do
+  end
+
+  describe '#list_orders' do
+  end
+
+  describe '#list_items_in_order' do
+  end
+
+  describe '#list_open_orders' do
+  end
+
+  describe '#list_closed_orders' do
+  end
+
+  describe '#mark_complete' do
+  end
+#### STAFF CLASS ####
+  describe '#create_staff' do
+    it 'creates a staff member given a name and returns an array of staff information' do
+      expect(Restaurant.orm.create_staff("Sara")).to be_a(Array)
     end
   end
 
-
+  describe '#get_staff' do
+    it 'looks up a staff tuple by id and returns an array with the staff information' do
+      Restaurant.orm.create_staff("Sara")
+      expect(Restaurant.orm.get_staff(1)).to be_a(Array)
+      expect(Restaurant.orm.get_staff(1).length).to eq(2)
+    end
+  end
 
 end

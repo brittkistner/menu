@@ -228,18 +228,9 @@ module Restaurant
   # ###########
   # #Menu Class
   # ###########
-    def get_menu(id)
-      command <<-SQL
-      SELECT * FROM Menus
-      WHERE id = '#{id}';
-      SQL
-
-      @db_adaptor.exec(command).values
-    end
-
     def add_menu(name)
-      command <<-SQL
-      INSERT INTO Menus (name)
+      command = <<-SQL
+      INSERT INTO menus (name)
       VALUES ('#{name}')
       RETURNING *;
       SQL
@@ -247,10 +238,20 @@ module Restaurant
       @db_adaptor.exec(command).values[0]
     end
 
+    def get_menu(id)
+      command = <<-SQL
+      SELECT * FROM menus
+      WHERE id = '#{id}';
+      SQL
+
+      @db_adaptor.exec(command).values[0]
+    end
+
+##Add food to menus_food (INSERT INTO)
     def get_food_items(mid,category)
       command = <<-SQL
         SELECT f.id, f.name, f.price, f.category, f.type_of_item
-        FROM MenusFood AS mf
+        FROM menus_food AS mf
         JOIN Food AS f
         ON mf.food_id = f.id
         WHERE mf.menu_id = '#{mid}' AND f.category = '#{category}'
@@ -262,7 +263,7 @@ module Restaurant
     def get_beverages(mid, category)
       command = <<-SQL
       SELECT f.id, f.name, f.price, f.category, f.type_of_item
-      FROM MenusFood AS mf
+      FROM menus_food AS mf
       JOIN Food AS f
       ON mf.food_id = f.id
       WHERE mf.menu_id = '#{mid}' AND f.category = '#{category}' AND f.type_of_item = 'beverage'
@@ -274,99 +275,99 @@ module Restaurant
   # ############
   # #Order Class
   # ############
-  #   def get_order(id)
-  #     command <<-SQL
-  #     SELECT * FROM Orders
-  #     WHERE id = '#{id}';
-  #     SQL
 
-  #     @db_adaptor.exec(command).values
-  #   end
+    def add_order(customer_id)
+      status = "open"
+      creation_time = Time.now
+      command <<-SQL
+      INSERT INTO Orders (customer_id, creation_time, status)
+      VALUES ('#{customer_id}', '#{creation_time}', '#{status}')
+      RETURNING *;
+      SQL
 
-  #   def add_order(customer_id)
-  #     status = "open"
-  #     creation_time = Time.now
-  #     command <<-SQL
-  #     INSERT INTO Orders (customer_id, creation_time, status)
-  #     VALUES ('#{customer_id}', '#{creation_time}', '#{status}')
-  #     RETURNING *;
-  #     SQL
+      @db_adaptor.exec(command).values[0]
+    end
 
-  #     @db_adaptor.exec(command).values[0]
-  #   end
+    def get_order(id)
+      command <<-SQL
+      SELECT * FROM Orders
+      WHERE id = '#{id}';
+      SQL
 
-  #   def list_orders
-  #     command = <<-SQL
-  #     SELECT * FROM ORDERS
-  #     SQL
+      @db_adaptor.exec(command).values
+    end
 
-  #     @db_adaptor.exec(command).values
-  #   end
+    def list_orders
+      command = <<-SQL
+      SELECT * FROM ORDERS
+      SQL
 
-  #   def list_items_in_order(order_id)
-  #     command = <<-SQL
-  #     SELECT f.id, f.name, f.price, f.category, f.type_of_item
-  #     FROM OrdersFood AS of
-  #     JOIN Food AS f
-  #     ON of.item_id = f.id
-  #     WHERE of.order_id= '#{order_id}';
-  #     SQL
+      @db_adaptor.exec(command).values
+    end
 
-  #     @db_adaptor.exec(command).values
-  #   end
+    def list_items_in_order(order_id)
+      command = <<-SQL
+      SELECT f.id, f.name, f.price, f.category, f.type_of_item
+      FROM OrdersFood AS of
+      JOIN Food AS f
+      ON of.item_id = f.id
+      WHERE of.order_id= '#{order_id}';
+      SQL
 
-  #   def list_open_orders
-  #     command = <<-SQL
-  #     SELECT *
-  #     FROM Orders
-  #     WHERE status = "open";
-  #     SQL
+      @db_adaptor.exec(command).values
+    end
 
-  #     @db_adaptor.exec(command).values
-  #   end
+    def list_open_orders
+      command = <<-SQL
+      SELECT *
+      FROM Orders
+      WHERE status = "open";
+      SQL
 
-  #   def list_closed_orders
-  #     command = <<-SQL
-  #     SELECT *
-  #     FROM Orders
-  #     WHERE status = "closed";
-  #     SQL
+      @db_adaptor.exec(command).values
+    end
 
-  #     @db_adaptor.exec(command).values
-  #   end
+    def list_closed_orders
+      command = <<-SQL
+      SELECT *
+      FROM Orders
+      WHERE status = "closed";
+      SQL
 
-  #   def mark_complete(order_id)
-  #     <<-SQL
-  #     UPDATE Orders
-  #     SET status = 'closed'
-  #     WHERE id = '#{order_id}';
-  #     SQL
+      @db_adaptor.exec(command).values
+    end
 
-  #     true
-  #   end
+    def mark_complete(order_id)
+      <<-SQL
+      UPDATE Orders
+      SET status = 'closed'
+      WHERE id = '#{order_id}';
+      SQL
+
+      true
+    end
 
   # ############
   # #Staff Class
   # ############
+    def create_staff(name)
+      command = <<-SQL
+      INSERT INTO staff(name)
+      VALUES ('#{name}')
+      RETURNING *;
+      SQL
 
-  #   def get_staff(id)
-  #     command <<-SQL
-  #     SELECT * FROM Staff
-  #     WHERE id = '#{id}';
-  #     SQL
+      @db_adaptor.exec(command).values[0]
+    end
 
-  #     @db_adaptor.exec(command).values
-  #   end
+    def get_staff(id)
+      command = <<-SQL
+      SELECT * FROM staff
+      WHERE id = '#{id}';
+      SQL
 
-  #   def create_staff(name)
-  #     command <<-SQL
-  #     INSERT INTO Staff(name)
-  #     VALUES ('#{name}')
-  #     RETURNING *;
-  #     SQL
-
-  #     @db_adaptor.exec(command).values[0]
-  #   end
+      @db_adaptor.exec(command).values[0]
+    end
   end
 
   def self.orm
