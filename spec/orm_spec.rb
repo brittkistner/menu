@@ -20,20 +20,20 @@ describe 'Orm' do
 
   ####FOOD CLASS ######
   describe '#create_food' do
-    xit 'adds a tuple to the food table and returns an array with the food information' do
+    it 'adds a tuple to the food table and returns an array with the food information' do
       expect(Restaurant.orm.create_food("hamburger", 10, "entree")).to be_a(Array)
     end
   end
 
   describe '#get_food' do
-    xit 'looks up a food tuple by id and returns an array with the food information' do
+    it 'looks up a food tuple by id and returns an array with the food information' do
       Restaurant.orm.create_food("hamburger", 10,"entree")
       expect(Restaurant.orm.get_food(1)).to be_a(Array)
     end
   end
 
   describe '#remove_food' do
-    xit 'removes a tuple from the food table and returns true' do
+    it 'removes a tuple from the food table and returns true' do
       Restaurant.orm.create_food("hamburger", 10, "entree")
       Restaurant.orm.remove_food(1)
       expect(Restaurant.orm.get_food(1)).to be_nil
@@ -41,7 +41,7 @@ describe 'Orm' do
   end
 
   describe '#list_all_food' do
-    xit 'retrieves all information from the food table and returns as an array of arrays' do
+    it 'retrieves all information from the food table and returns as an array of arrays' do
       Restaurant.orm.create_food("hamburger", 10, "entree")
       Restaurant.orm.create_food("burrito", 8, "entree")
       expect(Restaurant.orm.list_all_food.length).to eq(2)

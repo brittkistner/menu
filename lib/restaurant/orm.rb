@@ -83,42 +83,45 @@ module Restaurant
       create_tables
     end
 
-  #Food Class
-    # def create_food(name, price, type_of_item)
-    #   command = <<-SQL
-    #   INSERT INTO food (name, price, type_of_item)
-    #   VALUES ('#{name}', '#{price}','#{type_of_item}')
-    #   RETURNING *;
-    #   SQL
+  ##################
+  ####Food Class####
+  ##################
+    def create_food(name, price, type_of_item)
+      command = <<-SQL
+      INSERT INTO food (name, price, type_of_item)
+      VALUES ('#{name}', '#{price}','#{type_of_item}')
+      RETURNING *;
+      SQL
 
-    #   @db_adaptor.exec(command).values[0]
-    # end
+      @db_adaptor.exec(command).values[0]
+    end
 
-    # def get_food(id)
-    #   command = <<-SQL
-    #   SELECT * FROM food
-    #   WHERE id = '#{id}';
-    #   SQL
+    def get_food(id)
+      command = <<-SQL
+      SELECT * FROM food
+      WHERE id = '#{id}';
+      SQL
 
-    #   @db_adaptor.exec(command).values[0]
-    # end
+      @db_adaptor.exec(command).values[0]
+    end
 
-    # def remove_food(id)
-    #   command = <<-SQL
-    #   DELETE * FROM food
-    #   WHERE id = '#{id}';
-    #   SQL
+    def remove_food(id)
+      command = <<-SQL
+      DELETE
+      FROM food
+      WHERE id = '#{id}';
+      SQL
 
-    #   @db_adaptor.exec(command)
-    # end
+      @db_adaptor.exec(command)
+    end
 
-    # def list_all_food
-    #   command = <<-SQL
-    #   SELECT * FROM food;
-    #   SQL
+    def list_all_food
+      command = <<-SQL
+      SELECT * FROM food;
+      SQL
 
-    #   @db_adaptor.exec(command).values
-    # end
+      @db_adaptor.exec(command).values
+    end
 
   # ###############
   # #Customer Class
