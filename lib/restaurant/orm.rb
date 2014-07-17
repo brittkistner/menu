@@ -26,7 +26,6 @@ module Restaurant
         PRIMARY KEY (id),
         name TEXT,
         price INTEGER,
-        category TEXT,
         type_of_item TEXT
         );
       CREATE TABLE IF NOT EXISTS orders_food(
@@ -61,7 +60,6 @@ module Restaurant
        SQL
 
       @db_adaptor.exec(command)
-
     end
 
     def drop_tables
@@ -86,45 +84,45 @@ module Restaurant
     end
 
   #Food Class
-    def create_food(name, price, category,type_of_item)
-      command = <<-SQL
-      INSERT INTO food (name, price, category, type_of_item)
-      VALUES ('#{name}', '#{price}', '#{category}', '#{type_of_item}')
-      RETURNING *;
-      SQL
+    # def create_food(name, price, type_of_item)
+    #   command = <<-SQL
+    #   INSERT INTO food (name, price, type_of_item)
+    #   VALUES ('#{name}', '#{price}','#{type_of_item}')
+    #   RETURNING *;
+    #   SQL
 
-      @db_adaptor.exec(command).values[0]
-    end
+    #   @db_adaptor.exec(command).values[0]
+    # end
 
-    def get_food(id)
-      command = <<-SQL
-      SELECT * FROM food
-      WHERE id = '#{id}';
-      SQL
+    # def get_food(id)
+    #   command = <<-SQL
+    #   SELECT * FROM food
+    #   WHERE id = '#{id}';
+    #   SQL
 
-      @db_adaptor.exec(command).values[0]
-    end
+    #   @db_adaptor.exec(command).values[0]
+    # end
 
-    def remove_food(id) #rescue??
-      <<-SQL
-      DELETE * FROM food
-      WHERE id = '#{id}';
-      SQL
+    # def remove_food(id)
+    #   command = <<-SQL
+    #   DELETE * FROM food
+    #   WHERE id = '#{id}';
+    #   SQL
 
-      true
-    end
+    #   @db_adaptor.exec(command)
+    # end
 
-    def list_all_food
-      command = <<-SQL
-      SELECT * FROM food;
-      SQL
+    # def list_all_food
+    #   command = <<-SQL
+    #   SELECT * FROM food;
+    #   SQL
 
-      @db_adaptor.exec(command).values
-    end
+    #   @db_adaptor.exec(command).values
+    # end
 
-  ###############
-  #Customer Class
-  ###############
+  # ###############
+  # #Customer Class
+  # ###############
     def get_customer(id)
       command = <<-SQL
       SELECT * FROM customers
@@ -143,9 +141,9 @@ module Restaurant
 
       @db_adaptor.exec(command).values[0] #returns [id,name]
     end
-  # #####################
-  # #Shopping Cart Class
-  # #####################
+#   # #####################
+#   # #Shopping Cart Class
+#   # #####################
     def add_shopping_cart(customer_id)
       command = <<-SQL
       INSERT INTO shopping_cart (customer_id)
@@ -169,6 +167,10 @@ module Restaurant
     end
 
     def add_food_item (scid, fid, quantity)
+      #SELECT to see if item is there
+      #if not then I would insert
+      #else, increase the quantity
+      #remove increase quantity
       command = <<-SQL
       INSERT INTO shopping_cart_food (SCID, item_id, item_quantity)
       VALUES ('#{scid}', '#{fid}', '#{quantity}');
@@ -193,7 +195,7 @@ module Restaurant
 
     def list_items_in_shopping_cart(scid)
       command = <<-SQL
-      SELECT f.id, f.name, f.price, f.category, f.type_of_item, scf.item_quantity
+      SELECT f.id, f.name, f.price, , f.type_of_item, scf.item_quantity
       FROM shopping_cart_food AS scf
       JOIN food AS f
       ON scf.item_id = f.id
@@ -219,15 +221,21 @@ module Restaurant
     end
 
 
-      # # def increase_quantity_of_item(fid)
-      # # end
+      def increase_quantity_of_item(scid, fid, quantity)
+      command <<-SQL
+      UPDATE shopping_cart_food
+      SET quantity = quantity + '#{quantity}'
+      WHERE SCID = '#{scid}' AND fid = '#{fid}'
+      SQL
+      end
 
       # # def decrease_quantity_of_item(fid)
+      #0 and negative numbers at 0 remove row, negative raise an error
       # # end
 
-  # ###########
-  # #Menu Class
-  # ###########
+  # # ###########
+  # # #Menu Class
+  # # ###########
     def add_menu(name)
       command = <<-SQL
       INSERT INTO menus (name)
@@ -247,130 +255,117 @@ module Restaurant
       @db_adaptor.exec(command).values[0]
     end
 
-##Add food to menus_food (INSERT INTO)
-    def get_food_items(mid,category)
+    def add_food_to_menu(mid,fid)
       command = <<-SQL
-        SELECT f.id, f.name, f.price, f.category, f.type_of_item
+        SELECT f.id, f.name, f.price, f.type_of_item
         FROM menus_food AS mf
         JOIN Food AS f
         ON mf.food_id = f.id
-        WHERE mf.menu_id = '#{mid}' AND f.category = '#{category}'
+        WHERE mf.menu_id = '#{mid}' AND f.id = '#{fid}'
       SQL
 
       @db_adaptor.exec(command).values
     end
 
-    def get_beverages(mid, category)
-      command = <<-SQL
-      SELECT f.id, f.name, f.price, f.category, f.type_of_item
-      FROM menus_food AS mf
-      JOIN Food AS f
-      ON mf.food_id = f.id
-      WHERE mf.menu_id = '#{mid}' AND f.category = '#{category}' AND f.type_of_item = 'beverage'
-      SQL
+  # # ############
+  # # #Order Class
+  # # ############
 
-      @db_adaptor.exec(command).values
-    end
+  #   def add_order(customer_id)
+  #     status = "open"
+  #     creation_time = Time.now
+  #     command = <<-SQL
+  #     INSERT INTO Orders (customer_id, creation_time, status)
+  #     VALUES ('#{customer_id}', '#{creation_time}', '#{status}')
+  #     RETURNING *;
+  #     SQL
 
-  # ############
-  # #Order Class
-  # ############
+  #     @db_adaptor.exec(command).values[0]
+  #   end
 
-    def add_order(customer_id)
-      status = "open"
-      creation_time = Time.now
-      command = <<-SQL
-      INSERT INTO Orders (customer_id, creation_time, status)
-      VALUES ('#{customer_id}', '#{creation_time}', '#{status}')
-      RETURNING *;
-      SQL
+  #   def get_order(id)
+  #     command = <<-SQL
+  #     SELECT * FROM Orders
+  #     WHERE id = '#{id}';
+  #     SQL
 
-      @db_adaptor.exec(command).values[0]
-    end
+  #     @db_adaptor.exec(command).values[0]
+  #   end
 
-    def get_order(id)
-      command = <<-SQL
-      SELECT * FROM Orders
-      WHERE id = '#{id}';
-      SQL
+  #   def list_orders
+  #     command = <<-SQL
+  #     SELECT * FROM ORDERS
+  #     SQL
 
-      @db_adaptor.exec(command).values[0]
-    end
+  #     @db_adaptor.exec(command).values
+  #   end
 
-    def list_orders
-      command = <<-SQL
-      SELECT * FROM ORDERS
-      SQL
+  #   def list_items_in_order(order_id)
+  #     command = <<-SQL
+  #     SELECT f.id, f.name, f.price, f.type_of_item
+  #     FROM orders_food AS of
+  #     JOIN food AS f
+  #     ON of.item_id = f.id
+  #     WHERE of.order_id= '#{order_id}';
+  #     SQL
 
-      @db_adaptor.exec(command).values
-    end
+  #     @db_adaptor.exec(command).values
+  #   end
+  #   #shopping cart order join table
 
-    def list_items_in_order(order_id)
-      command = <<-SQL
-      SELECT f.id, f.name, f.price, f.category, f.type_of_item
-      FROM OrdersFood AS of
-      JOIN Food AS f
-      ON of.item_id = f.id
-      WHERE of.order_id= '#{order_id}';
-      SQL
+  #   def list_open_orders
+  #     command = <<-SQL
+  #     SELECT *
+  #     FROM orders
+  #     WHERE status = 'open';
+  #     SQL
 
-      @db_adaptor.exec(command).values
-    end
-    #shopping cart order join table
+  #     @db_adaptor.exec(command).values
+  #   end
 
-    def list_open_orders
-      command = <<-SQL
-      SELECT *
-      FROM Orders
-      WHERE status = 'open';
-      SQL
+  #   def list_closed_orders
+  #     command = <<-SQL
+  #     SELECT *
+  #     FROM orders
+  #     WHERE status = 'closed';
+  #     SQL
 
-      @db_adaptor.exec(command).values
-    end
+  #     @db_adaptor.exec(command).values
+  #   end
 
-    def list_closed_orders
-      command = <<-SQL
-      SELECT *
-      FROM Orders
-      WHERE status = 'closed';
-      SQL
+  #   def mark_complete(order_id)
+  #     command = <<-SQL
+  #     UPDATE orders
+  #     SET status = 'closed'
+  #     WHERE id = '#{order_id}';
+  #     SQL
 
-      @db_adaptor.exec(command).values
-    end
+  #     @db_adaptor.exec(command)
 
-    def mark_complete(order_id)
-      command = <<-SQL
-      UPDATE Orders
-      SET status = 'closed'
-      WHERE id = '#{order_id}';
-      SQL
+  #     true
+  #   end
 
-      @db_adaptor.exec(command)
+  # # ############
+  # # #Staff Class
+  # # ############
+  #   def create_staff(name)
+  #     command = <<-SQL
+  #     INSERT INTO staff(name)
+  #     VALUES ('#{name}')
+  #     RETURNING *;
+  #     SQL
 
-      true
-    end
+  #     @db_adaptor.exec(command).values[0]
+  #   end
 
-  # ############
-  # #Staff Class
-  # ############
-    def create_staff(name)
-      command = <<-SQL
-      INSERT INTO staff(name)
-      VALUES ('#{name}')
-      RETURNING *;
-      SQL
+  #   def get_staff(id)
+  #     command = <<-SQL
+  #     SELECT * FROM staff
+  #     WHERE id = '#{id}';
+  #     SQL
 
-      @db_adaptor.exec(command).values[0]
-    end
-
-    def get_staff(id)
-      command = <<-SQL
-      SELECT * FROM staff
-      WHERE id = '#{id}';
-      SQL
-
-      @db_adaptor.exec(command).values[0]
-    end
+  #     @db_adaptor.exec(command).values[0]
+  #   end
   end
 
   def self.orm

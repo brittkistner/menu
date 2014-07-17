@@ -7,8 +7,8 @@ class Restaurant::Order
   attr_accessor :status
 
   def initialize(id, customer_id, creation_time, status)
-    @id = id
-    @customer_id = customer_id
+    @id = Integer(id)
+    @customer_id = Integer(customer_id)
     @creation_time = DateTime.parse(creation_time)
     @status = status
   end
@@ -18,7 +18,7 @@ class Restaurant::Order
     Restaurant::Order.new(result[0], result[1], result[2], result[3])
   end
 
-  def create_order(customer_id)
+  def self.create_order(customer_id)
     result = Restaurant.orm.add_order(customer_id)
     order = Restaurant::Order.new(result[0],result[1],result[2], result[3])
     order

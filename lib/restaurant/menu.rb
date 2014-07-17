@@ -1,10 +1,12 @@
 class Restaurant::Menu
 
   attr_reader :id, :name
+  attr_accessor :menu_list
 
   def initialize(id, name)
-    @id = id
+    @id = Integer(id)
     @name = name
+    @menu_list = []
   end
 
   def self.get(id)
@@ -12,38 +14,44 @@ class Restaurant::Menu
     Restaurant::Menu.new(result[0],result[1])
   end
 
-  def create_menu(name)
+  def self.create_menu(name)
     result = Restaurant.orm.add_menu(name)
     menu = Restaurant::Menu.new(result[0],result[1])
     menu
   end
 
-  def get_food_items(category) #brings back info for all food items for a particular category in no particular order
-    result = Restaurant.orm.get_food_items(@id, category)
-    items = []
+  def add_food_to_menu(fid)
+    result = Restaurant.orm.add_food_to_menu(@id,fid)
 
-    result.each do |item|
-      items << Restaurant::Food.new(item[0], item[1], item[2], item[3], item[4])
+    food = Restaurant::Food.new(result[0],result[1],result[2],result[3])
+
+    menu_list << food
+
+    '#{food.name} added to #{@name}'
+  end
+
+  def get_beverages
+    menu_list.each do |x|
+      if x.type_of_item == "beverage"
+        x.name
+      end
     end
-
-    items #returns an array of food objects
   end
 
-  def get_beverages(category)
-    result = Restaurant.orm.get_beverages(@id, category)
-    items = []
-
-    result.each do |item|
-      items << Restaurant::Food.new(item[0], item[1], item[2], item[3], item[4])
+  def get_appetizers
+    menu_list.each do |x|
+      if x.type_of_item == "appetizer"
+        x.name
+      end
     end
-
-    items #returns an array of food objects which are of type beverages
   end
 
-  def get_appetizers(category)
-  end
-
-  def get_entrees(category)
+  def get_entrees
+    menu_list.map do |x|
+      if x.type_of_item == "entree"
+        x.name
+      end
+    end
   end
 
 end

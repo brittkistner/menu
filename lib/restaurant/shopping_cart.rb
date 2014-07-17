@@ -2,11 +2,11 @@ class Restaurant::Shopping_Cart
 
   attr_reader :id, :customer_id
   def initialize(id, customer_id)
-    @id = id
-    @customer_id = customer_id
+    @id = Integer(id)
+    @customer_id = Integer(customer_id)
   end
 
-  def create_shopping_cart(customer_id)
+  def self.create_shopping_cart(customer_id)
     result = Restaurant.orm.add_shopping_cart(customer_id)
     shopping_cart = Restaurant::Shopping_Cart.new(result[0],result[1])
     shopping_cart
@@ -51,6 +51,13 @@ class Restaurant::Shopping_Cart
     total = result.each {|price| sum += price}
     total #changed how it's returned in orm
   end
+
+#   -remove the category
+# -create new method (add food to menu by id)
+# -manually add each food item to menu using the menus_food join table
+
+# -list items in order
+# -copy all the food items over, iterate through the food items in shopping cart and then I add those to the order_food table, don’t do this in the orm
 
   def submit(customer_id) #allows the customer to submit order to restaurant staff
     Restaurant::Order.create(customer_id)
