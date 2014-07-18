@@ -101,6 +101,26 @@ describe 'Orm' do
     end
   end
 
+  describe 'get_food_from_shopping_cart' do
+    xit 'given the shopping cart id and food id, returns the food id and quantity' do
+      Restaurant.orm.create_customer("Benny")
+      Restaurant.orm.add_shopping_cart(1)
+
+      Restaurant.orm.create_food("hamburger", 10, "entree")
+
+      Restaurant.orm.add_food_item(1,1,2)
+
+      expect(Restaurant.orm.get_food_from_shopping_cart(1,1)[0]).to eq(1)
+    end
+
+    xit 'returns false if no food matching the food is is in the shopping cart' do
+      Restaurant.orm.create_customer("Benny")
+      Restaurant.orm.add_shopping_cart(1)
+
+      expect(Restaurant.orm.get_food_from_shopping_cart(1,1)).to eq(false)
+    end
+  end
+
   describe '#remove_food_item' do
     it 'removes a food item by id to a shopping cart with given id and returns true' do
       Restaurant.orm.create_customer("Benny")
@@ -110,7 +130,9 @@ describe 'Orm' do
 
       Restaurant.orm.add_food_item(1,1,2)
 
-      expect(Restaurant.orm.remove_food_item(1,1)).to eq(true)
+      Restaurant.orm.remove_food_item(1,1)
+
+      expect(Restaurant.orm.get_food_from_shopping_cart(1,1)).to eq(false)
     end
   end
 
@@ -153,14 +175,48 @@ describe 'Orm' do
   end
 
   describe '#decrease_quantity_of_item' do
-    it 'updates the quantity of a food item in the shopping cart' do
+    it 'checks if the food item exists in the shopping cart' do
+      Restaurant.orm.create_customer("Benny")
+      Restaurant.orm.add_shopping_cart(1)
+
+      expect(Restaurant.orm.decrease_quantity_of_item(1,1,2)).to eq(false)
+    end
+
+    xit 'updates the quantity of a food item in the shopping cart' do
+      Restaurant.orm.create_customer("Benny")
+      Restaurant.orm.add_shopping_cart(1)
+
+      Restaurant.orm.create_food("hamburger", 10, "entree")
+
+      Restaurant.orm.add_food_item(1,1,4)
+
+      Restaurant.orm.decrease_quantity_of_item(1,1,2)
+      # binding.pry
+      expect(Restaurant.orm.list_items_in_shopping_cart(1)[0][4]).to eq(2)
     end
 
     it 'does not allow the quantity of food items in a shopping cart to go negative' do
+      Restaurant.orm.create_customer("Benny")
+      Restaurant.orm.add_shopping_cart(1)
 
+      Restaurant.orm.create_food("hamburger", 10, "entree")
+
+      Restaurant.orm.add_food_item(1,1,4)
+
+      expect(Restaurant.orm.decrease_quantity_of_item(1,1,5)).to eq(false)
     end
 
-    it ' removes an item from the shopping cart when the quantity is zero' do
+    it 'removes an item from the shopping cart when the quantity is zero' do
+      Restaurant.orm.create_customer("Benny")
+      Restaurant.orm.add_shopping_cart(1)
+
+      Restaurant.orm.create_food("hamburger", 10, "entree")
+
+      Restaurant.orm.add_food_item(1,1,4)
+
+      Restaurant.orm.decrease_quantity_of_item(1,1,4)
+
+      expect(Restaurant.orm.get_food_from_shopping_cart(1,1)).to eq(false)
     end
   end
 

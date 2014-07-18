@@ -167,6 +167,21 @@ module Restaurant
       @db_adaptor.exec(command).values[0]
     end
 
+    def get_food_from_shopping_cart(scid, fid)
+      check_for_food = <<-SQL
+      SELECT item_id, item_quantity
+      FROM shopping_cart_food AS scf
+      WHERE item_id = '#{fid}'
+      SQL
+
+      if @db_adaptor.exec(check_for_food).values[0] == fid
+        @db_adaptor.exec(check_for_food).values[0]
+      else
+        false
+      end
+
+    end
+
     def add_food_item (scid, fid, quantity)
       check_for_food = <<-SQL
       SELECT *
@@ -209,25 +224,39 @@ module Restaurant
     end
 
     def decrease_quantity_of_item(scid, fid, quantity)
-      #check if food item is there
+
       check_for_food = <<-SQL
-      SELECT *
+      SELECT item_id
       FROM shopping_cart_food AS scf
       WHERE item_id = '#{fid}'
       SQL
-      #if there is, return the quantity
+
       return_quantity = <<-SQL
       SELECT item_quantity
       FROM shopping_cart_food AS scf
       WHERE item_id = '#{fid}'
       SQL
-      #if the quantity is 0, then run code which remove_food_item
-      #if the quantity is negative, raise an error
-      #else decrease item by quantity
-      #if not there, raise an error
 
+      update_food = <<-SQL
+      UPDATE shopping_cart_food
+      SET item_quantity = item_quantity - '#{quantity}'
+      WHERE SCID = '#{scid}' AND item_id = '#{fid}'
+      SQL
 
-    # 0 and negative numbers at 0 remove row, negative raise an error
+      if @db_adaptor.exec(check_for_food).values == fid
+        db_quantity = @db_adaptor.exec(return_quantity).values[0][0]
+        if db_quantity - quantity == 0
+          Restaurant.orm.remove_food_item(scid,fid)
+        elsif db_quantity - quantity < 0
+          false
+        else
+          @db_adaptor.exec(update_food)
+          true
+        end
+      else
+        false
+      end
+
     end
 
     def list_items_in_shopping_cart(scid)
@@ -239,10 +268,10 @@ module Restaurant
       WHERE scf.scid= '#{scid}';
       SQL
 
-      #code works but does not allocate the quantity of the food
-
       @db_adaptor.exec(command).values
     end
+
+    ##create method to list food item and quantity??
 
     def shopping_cart_item_prices(scid)
       command = <<-SQL
