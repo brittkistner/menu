@@ -1,5 +1,6 @@
 require './lib/restaurant.rb'
 
+
 RSpec.configure do |config|
   config.before(:all) do
     Restaurant.orm.instance_variable_set(:@db_adaptor, PG.connect(host: 'localhost', dbname: 'menu-db-test'))

@@ -278,105 +278,105 @@ module Restaurant
       @db_adaptor.exec(command).values[0]
     end
 
-  # # ############
-  # # #Order Class
-  # # ############
+  # ############
+  # #Order Class
+  # ############
 
-  #   def add_order(customer_id)
-  #     status = "open"
-  #     creation_time = Time.now
-  #     command = <<-SQL
-  #     INSERT INTO Orders (customer_id, creation_time, status)
-  #     VALUES ('#{customer_id}', '#{creation_time}', '#{status}')
-  #     RETURNING *;
-  #     SQL
+    def add_order(customer_id)
+      status = "open"
+      creation_time = Time.now
+      command = <<-SQL
+      INSERT INTO Orders (customer_id, creation_time, status)
+      VALUES ('#{customer_id}', '#{creation_time}', '#{status}')
+      RETURNING *;
+      SQL
 
-  #     @db_adaptor.exec(command).values[0]
-  #   end
+      @db_adaptor.exec(command).values[0]
+    end
 
-  #   def get_order(id)
-  #     command = <<-SQL
-  #     SELECT * FROM Orders
-  #     WHERE id = '#{id}';
-  #     SQL
+    def get_order(id)
+      command = <<-SQL
+      SELECT * FROM Orders
+      WHERE id = '#{id}';
+      SQL
 
-  #     @db_adaptor.exec(command).values[0]
-  #   end
+      @db_adaptor.exec(command).values[0]
+    end
 
-  #   def list_orders
-  #     command = <<-SQL
-  #     SELECT * FROM ORDERS
-  #     SQL
+    def list_orders
+      command = <<-SQL
+      SELECT * FROM ORDERS
+      SQL
 
-  #     @db_adaptor.exec(command).values
-  #   end
+      @db_adaptor.exec(command).values
+    end
 
-  #   def list_items_in_order(order_id)
-  #     command = <<-SQL
-  #     SELECT f.id, f.name, f.price, f.type_of_item
-  #     FROM orders_food AS of
-  #     JOIN food AS f
-  #     ON of.item_id = f.id
-  #     WHERE of.order_id= '#{order_id}';
-  #     SQL
+    def list_items_in_order(order_id)
+      command = <<-SQL
+      SELECT f.id, f.name, f.price, f.type_of_item
+      FROM orders_food AS of
+      JOIN food AS f
+      ON of.item_id = f.id
+      WHERE of.order_id= '#{order_id}';
+      SQL
 
-  #     @db_adaptor.exec(command).values
-  #   end
-  #   #shopping cart order join table
+      @db_adaptor.exec(command).values
+    end
+    #shopping cart order join table
 
-  #   def list_open_orders
-  #     command = <<-SQL
-  #     SELECT *
-  #     FROM orders
-  #     WHERE status = 'open';
-  #     SQL
+    def list_open_orders
+      command = <<-SQL
+      SELECT *
+      FROM orders
+      WHERE status = 'open';
+      SQL
 
-  #     @db_adaptor.exec(command).values
-  #   end
+      @db_adaptor.exec(command).values
+    end
 
-  #   def list_closed_orders
-  #     command = <<-SQL
-  #     SELECT *
-  #     FROM orders
-  #     WHERE status = 'closed';
-  #     SQL
+    def list_closed_orders
+      command = <<-SQL
+      SELECT *
+      FROM orders
+      WHERE status = 'closed';
+      SQL
 
-  #     @db_adaptor.exec(command).values
-  #   end
+      @db_adaptor.exec(command).values
+    end
 
-  #   def mark_complete(order_id)
-  #     command = <<-SQL
-  #     UPDATE orders
-  #     SET status = 'closed'
-  #     WHERE id = '#{order_id}';
-  #     SQL
+    def mark_complete(order_id)
+      command = <<-SQL
+      UPDATE orders
+      SET status = 'closed'
+      WHERE id = '#{order_id}';
+      SQL
 
-  #     @db_adaptor.exec(command)
+      @db_adaptor.exec(command)
 
-  #     true
-  #   end
+      true
+    end
 
-  # # ############
-  # # #Staff Class
-  # # ############
-  #   def create_staff(name)
-  #     command = <<-SQL
-  #     INSERT INTO staff(name)
-  #     VALUES ('#{name}')
-  #     RETURNING *;
-  #     SQL
+  ############
+  #Staff Class
+  ############
+    def create_staff(name)
+      command = <<-SQL
+      INSERT INTO staff(name)
+      VALUES ('#{name}')
+      RETURNING *;
+      SQL
 
-  #     @db_adaptor.exec(command).values[0]
-  #   end
+      @db_adaptor.exec(command).values[0]
+    end
 
-  #   def get_staff(id)
-  #     command = <<-SQL
-  #     SELECT * FROM staff
-  #     WHERE id = '#{id}';
-  #     SQL
+    def get_staff(id)
+      command = <<-SQL
+      SELECT * FROM staff
+      WHERE id = '#{id}';
+      SQL
 
-  #     @db_adaptor.exec(command).values[0]
-  #   end
+      @db_adaptor.exec(command).values[0]
+    end
   end
 
   def self.orm

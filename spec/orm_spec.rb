@@ -246,13 +246,13 @@ describe 'Orm' do
 
 #### STAFF CLASS ####
   describe '#create_staff' do
-    xit 'creates a staff member given a name and returns an array of staff information' do
+    it 'creates a staff member given a name and returns an array of staff information' do
       expect(Restaurant.orm.create_staff("Sara")).to be_a(Array)
     end
   end
 
   describe '#get_staff' do
-    xit 'looks up a staff tuple by id and returns an array with the staff information' do
+    it 'looks up a staff tuple by id and returns an array with the staff information' do
       Restaurant.orm.create_staff("Sara")
       expect(Restaurant.orm.get_staff(1)).to be_a(Array)
       expect(Restaurant.orm.get_staff(1).length).to eq(2)
