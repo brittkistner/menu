@@ -64,14 +64,14 @@ describe 'Orm' do
 
   ####SHOPPING_CART CLASS####
   describe '#add_shopping_cart'do
-    xit 'adds a tuple to the shopping_cart table and returns an array with the shopping_cart information' do
+    it 'adds a tuple to the shopping_cart table and returns an array with the shopping_cart information' do
       Restaurant.orm.create_customer("Benny")
       expect(Restaurant.orm.add_shopping_cart(1)).to be_a(Array)
     end
   end
 
   describe '#get_shopping_cart' do
-    xit 'looks up a shopping_cart tuple by id and returns an array with the shopping_cart information' do
+    it 'looks up a shopping_cart tuple by id and returns an array with the shopping_cart information' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_shopping_cart(1)
       expect(Restaurant.orm.get_shopping_cart(1)).to be_a(Array)
@@ -80,22 +80,33 @@ describe 'Orm' do
   end
 
   describe '#add_food_item' do
-    xit 'adds a food item by id, with a specified quantity to a shopping cart with given id and returns true' do
+    it 'adds a food item by id, with a specified quantity to a shopping cart with given id and returns true' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_shopping_cart(1)
 
-      Restaurant.orm.create_food("hamburger", 10, "lunch", "entree")
+      Restaurant.orm.create_food("hamburger", 10, "entree")
 
       expect(Restaurant.orm.add_food_item(1,1,2)).to eq(true)
+    end
+
+    it 'updates a food item by id, with a specified quantity to a shopping cart with given id and returns true' do
+      Restaurant.orm.create_customer("Benny")
+      Restaurant.orm.add_shopping_cart(1)
+
+      Restaurant.orm.create_food("hamburger", 10, "entree")
+
+      Restaurant.orm.add_food_item(1,1,2)
+
+      expect(Restaurant.orm.add_food_item(1,1,1)).to eq(true)
     end
   end
 
   describe '#remove_food_item' do
-    xit 'removes a food item by id to a shopping cart with given id and returns true' do
+    it 'removes a food item by id to a shopping cart with given id and returns true' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_shopping_cart(1)
 
-      Restaurant.orm.create_food("hamburger", 10, "lunch", "entree")
+      Restaurant.orm.create_food("hamburger", 10, "entree")
 
       Restaurant.orm.add_food_item(1,1,2)
 
@@ -104,21 +115,21 @@ describe 'Orm' do
   end
 
   describe '#list_items_in_shopping_cart' do
-    xit 'retrieves all information from the shopping_cart, given the id, returns as an array of arrays with food entity information' do
+    it 'retrieves all information from the shopping_cart, given the id, returns as an array of arrays with food entity information' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_shopping_cart(1)
 
-      Restaurant.orm.create_food("hamburger", 10, "lunch", "entree")
+      Restaurant.orm.create_food("hamburger", 10, "entree")
       Restaurant.orm.add_food_item(1,1,2)
 
       expect(Restaurant.orm.list_items_in_shopping_cart(1).length).to eq(1)
     end
 
-    xit 'returns an empty array when a food item is removed from the shopping cart' do
+    it 'returns an empty array when a food item is removed from the shopping cart' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_shopping_cart(1)
 
-      Restaurant.orm.create_food("hamburger", 10, "lunch", "entree")
+      Restaurant.orm.create_food("hamburger", 10, "entree")
       Restaurant.orm.add_food_item(1,1,2)
       Restaurant.orm.remove_food_item(1,1)
 
@@ -127,12 +138,12 @@ describe 'Orm' do
   end
 
   describe '#shopping_cart_item_prices' do
-    xit 'retrieves the prices for all items in a shopping_cart and returns as an array of prices' do
+    it 'retrieves the prices for all items in a shopping_cart and returns as an array of prices' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_shopping_cart(1)
 
-      Restaurant.orm.create_food("hamburger", 10, "lunch", "entree")
-      Restaurant.orm.create_food("burrito", 8, "lunch", "entree")
+      Restaurant.orm.create_food("hamburger", 10, "entree")
+      Restaurant.orm.create_food("burrito", 8, "entree")
 
       Restaurant.orm.add_food_item(1,1,2)
       Restaurant.orm.add_food_item(1,2,1)
@@ -141,12 +152,18 @@ describe 'Orm' do
     end
   end
 
-  describe '#increase_quantity_of_item' do
-
-  end
-
   describe '#decrease_quantity_of_item' do
+    it 'updates the quantity of a food item in the shopping cart' do
+    end
+
+    it 'does not allow the quantity of food items in a shopping cart to go negative' do
+
+    end
+
+    it ' removes an item from the shopping cart when the quantity is zero' do
+    end
   end
+
 #### MENU CLASS ####
   describe '#add_menu' do
     it 'creates a menu given a name and returns an array of menu information' do

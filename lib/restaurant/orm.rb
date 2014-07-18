@@ -168,18 +168,32 @@ module Restaurant
     end
 
     def add_food_item (scid, fid, quantity)
-      #SELECT to see if item is there
-      #if not then I would insert
-      #else, increase the quantity
-      #remove increase quantity
-      command = <<-SQL
+      check_for_food = <<-SQL
+      SELECT *
+      FROM shopping_cart_food AS scf
+      WHERE item_id = '#{fid}'
+      SQL
+      #Returns the item
+
+      update_food = <<-SQL
+      UPDATE shopping_cart_food
+      SET item_quantity = item_quantity + '#{quantity}'
+      WHERE SCID = '#{scid}' AND item_id = '#{fid}'
+      SQL
+
+      add_food = <<-SQL
       INSERT INTO shopping_cart_food (SCID, item_id, item_quantity)
       VALUES ('#{scid}', '#{fid}', '#{quantity}');
       SQL
-#RETURNING* in order to show the deleted item
 
-      @db_adaptor.exec(command)
-      true
+      if @db_adaptor.exec(check_for_food).values[1] == fid
+        @db_adaptor.exec(update_food)
+        true
+      else
+        @db_adaptor.exec(add_food)
+        true
+      end
+
     end
 
     def remove_food_item (scid, fid)
@@ -190,13 +204,35 @@ module Restaurant
       SQL
 
       @db_adaptor.exec(command)
-#RETURNING* in order to return the deleted item
+
       true
+    end
+
+    def decrease_quantity_of_item(scid, fid, quantity)
+      #check if food item is there
+      check_for_food = <<-SQL
+      SELECT *
+      FROM shopping_cart_food AS scf
+      WHERE item_id = '#{fid}'
+      SQL
+      #if there is, return the quantity
+      return_quantity = <<-SQL
+      SELECT item_quantity
+      FROM shopping_cart_food AS scf
+      WHERE item_id = '#{fid}'
+      SQL
+      #if the quantity is 0, then run code which remove_food_item
+      #if the quantity is negative, raise an error
+      #else decrease item by quantity
+      #if not there, raise an error
+
+
+    # 0 and negative numbers at 0 remove row, negative raise an error
     end
 
     def list_items_in_shopping_cart(scid)
       command = <<-SQL
-      SELECT f.id, f.name, f.price, , f.type_of_item, scf.item_quantity
+      SELECT f.id, f.name, f.price, f.type_of_item, scf.item_quantity
       FROM shopping_cart_food AS scf
       JOIN food AS f
       ON scf.item_id = f.id
@@ -221,22 +257,9 @@ module Restaurant
       #returns an array of prices and quantity of each item
     end
 
-
-      def increase_quantity_of_item(scid, fid, quantity)
-      command = <<-SQL
-      UPDATE shopping_cart_food
-      SET quantity = quantity + '#{quantity}'
-      WHERE SCID = '#{scid}' AND fid = '#{fid}'
-      SQL
-      end
-
-      # # def decrease_quantity_of_item(fid)
-      #0 and negative numbers at 0 remove row, negative raise an error
-      # # end
-
-  # # ###########
-  # # #Menu Class
-  # # ###########
+  # ###########
+  # #Menu Class
+  # ###########
     def add_menu(name)
       command = <<-SQL
       INSERT INTO menus (name)
