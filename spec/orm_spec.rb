@@ -149,23 +149,23 @@ describe 'Orm' do
   end
 #### MENU CLASS ####
   describe '#add_menu' do
-    xit 'creates a menu given a name and returns an array of menu information' do
+    it 'creates a menu given a name and returns an array of menu information' do
       expect(Restaurant.orm.add_menu("lunch")).to be_a(Array)
     end
   end
 
   describe '#get_menu' do
-    xit 'looks up a menu tuple by id and returns an array with the menu information' do
+    it 'looks up a menu tuple by id and returns an array with the menu information' do
       Restaurant.orm.add_menu("lunch")
       expect(Restaurant.orm.get_menu(1).length).to eq(2)
     end
   end
 
   describe '#add_food_to_menu' do
-    xit 'adds a food item to the menu given a menu_id and food_id' do
+    it 'adds a food item to the menu given a menu_id and food_id' do
       Restaurant.orm.add_menu("lunch")
 
-      Restaurant.orm.create_food("hamburger", 10, "lunch", "entree")
+      Restaurant.orm.create_food("hamburger", 10, "entree")
 
       expect(Restaurant.orm.add_food_to_menu(1,1)).to be_a(Array)
     end

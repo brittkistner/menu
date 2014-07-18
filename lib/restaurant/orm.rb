@@ -144,17 +144,15 @@ module Restaurant
 
       @db_adaptor.exec(command).values[0] #returns [id,name]
     end
-#   # #####################
-#   # #Shopping Cart Class
-#   # #####################
+  # #####################
+  # #Shopping Cart Class
+  # #####################
     def add_shopping_cart(customer_id)
       command = <<-SQL
       INSERT INTO shopping_cart (customer_id)
       VALUES ('#{customer_id}')
       RETURNING *;
       SQL
-
-      #customer id?
 
       @db_adaptor.exec(command).values[0]
     end
@@ -225,7 +223,7 @@ module Restaurant
 
 
       def increase_quantity_of_item(scid, fid, quantity)
-      command <<-SQL
+      command = <<-SQL
       UPDATE shopping_cart_food
       SET quantity = quantity + '#{quantity}'
       WHERE SCID = '#{scid}' AND fid = '#{fid}'
@@ -258,16 +256,26 @@ module Restaurant
       @db_adaptor.exec(command).values[0]
     end
 
+    def add_menus_food(mid, fid)
+      command = <<-SQL
+      INSERT INTO menus_food (menu_id, food_id)
+      VALUES ('#{mid}', '#{fid}');
+      SQL
+      @db_adaptor.exec(command)
+    end
+
     def add_food_to_menu(mid,fid)
+      Restaurant.orm.add_menus_food(mid,fid)
+
       command = <<-SQL
         SELECT f.id, f.name, f.price, f.type_of_item
         FROM menus_food AS mf
         JOIN Food AS f
         ON mf.food_id = f.id
-        WHERE mf.menu_id = '#{mid}' AND f.id = '#{fid}'
+        WHERE mf.menu_id = '#{mid}' AND f.id = '#{fid}';
       SQL
 
-      @db_adaptor.exec(command).values
+      @db_adaptor.exec(command).values[0]
     end
 
   # # ############
