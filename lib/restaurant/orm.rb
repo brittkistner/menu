@@ -174,7 +174,7 @@ module Restaurant
       WHERE item_id = '#{fid}'
       SQL
 
-      if @db_adaptor.exec(check_for_food).values[0] == fid
+      if @db_adaptor.exec(check_for_food).values[0][0].to_i == fid
         @db_adaptor.exec(check_for_food).values[0]
       else
         false
@@ -271,8 +271,6 @@ module Restaurant
       @db_adaptor.exec(command).values
     end
 
-    ##create method to list food item and quantity??
-
     def shopping_cart_item_prices(scid)
       command = <<-SQL
       SELECT f.price, scf.item_quantity
@@ -355,6 +353,30 @@ module Restaurant
       @db_adaptor.exec(command).values[0]
     end
 
+    def submit_order(scid,order_id)
+      shopping_cart_items_and_quantity = <<-SQL
+      SELECT item_id, item_quantity
+      FROM shopping_cart_food;
+      SQL
+
+
+      add_food_to_orders_food = <<-SQL
+      INSERT INTO orders_food(order_id, item_id, item_quantity)
+      Values ('#{order_id}', '#{item_id}', '#{item_quantity}');
+      SQL
+
+      array = @db_adaptor.exec(shopping_cart_items_and_quantity).values
+
+      array.each do |x|
+        item_id = x[0]
+        item_quantity = x[1]
+        @db_adaptor.exec(add_food_to_orders_food)
+      end
+
+      true
+    end
+
+
     def list_orders
       command = <<-SQL
       SELECT * FROM ORDERS
@@ -363,7 +385,7 @@ module Restaurant
       @db_adaptor.exec(command).values
     end
 
-    def list_items_in_order(order_id)
+    def list_items_in_order(order_id) #does not return the quantity of items
       command = <<-SQL
       SELECT f.id, f.name, f.price, f.type_of_item
       FROM orders_food AS of
@@ -374,7 +396,6 @@ module Restaurant
 
       @db_adaptor.exec(command).values
     end
-    #shopping cart order join table
 
     def list_open_orders
       command = <<-SQL

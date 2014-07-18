@@ -17,14 +17,18 @@ class Restaurant::Shopping_Cart
     Restaurant::Shopping_Cart.new(result[0], result[1])
   end
 
-  def add_item(fid,quantity) #join table?
+  def add_item(fid,quantity)
     Restaurant.orm.add_food_item(@id,fid,quantity)
-    #what will it return?
   end
 
-  def remove_item(fid)
-    Restaurant.orm.remove_food_item(@id,fid)
-    #what will it return?
+  def decrease_food(fid, quantity)
+    Restaurant.orm.decrease_food(@id,fid,quantity)
+  end
+
+  def food_quantity(fid) #will return the food id and food quantity from the shopping cart as an array [food_id, food_quantity]
+    result=Restaurant.orm.get_food_from_shopping_cart(@id,fid)
+    array = [result[0].to_i, result[1].to_i]
+    array
   end
 
   def list_items
@@ -32,34 +36,33 @@ class Restaurant::Shopping_Cart
     items = []
 
     result.each do |item|
-      items << Restaurant::Food.new(item[0], item[1], item[2], item[3], item[4])
+      items << Restaurant::Food.new(item[0], item[1], item[2], item[3])
     end
 
     items #returns an array of food items
-    #how to list the quantity of food items? look at change in orm to adjust for quantity
   end
 
-  # def increase_quantity_of_item(fid)
-  # end
+##Need a method with a food instance + quantity
 
-  # def decrease_quantity_of_item(fid)
-  # end
+
+  def decrease_quantity_of_item(fid)
+
+  end
 
   def total #totals order for customer prior to submitting
-  #return an array of the list items price
-    result = Restaurant.orm.shopping_cart_item_prices(@id)
-    total = result.each {|price| sum += price}
-    total #changed how it's returned in orm
+    # result = Restaurant.orm.shopping_cart_item_prices(@id) #returns an array of arrays of [food_price, food_quantity]
+    # # total = result.each {|price| sum += price}
+    # result.each do |array|
+    #   array.each do
+    # total #changed how it's returned in orm
+
+    #list items
+    #iterate through each object food.price * food.quantity
   end
 
-#   -remove the category
-# -create new method (add food to menu by id)
-# -manually add each food item to menu using the menus_food join table
-
-# -list items in order
-# -copy all the food items over, iterate through the food items in shopping cart and then I add those to the order_food table, don’t do this in the orm
-
   def submit(customer_id) #allows the customer to submit order to restaurant staff
-    Restaurant::Order.create(customer_id)
+    order = Restaurant::Order.create(customer_id)
+    Restaurant.orm.submit(@id, order.id)
+    'Order #{order.id} created'
   end
 end

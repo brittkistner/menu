@@ -89,7 +89,7 @@ describe 'Orm' do
       expect(Restaurant.orm.add_food_item(1,1,2)).to eq(true)
     end
 
-    it 'updates a food item by id, with a specified quantity to a shopping cart with given id and returns true' do
+    xit 'updates a food item by id, with a specified quantity to a shopping cart with given id and returns true' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_shopping_cart(1)
 
@@ -97,12 +97,16 @@ describe 'Orm' do
 
       Restaurant.orm.add_food_item(1,1,2)
 
-      expect(Restaurant.orm.add_food_item(1,1,1)).to eq(true)
+      expect(Restaurant.orm.get_food_from_shopping_cart(1,1)[0].to_i).to eq(2)
+
+      # Restaurant.orm.add_food_item(1,1,1)
+
+      # expect(Restaurant.orm.get_food_from_shopping_cart(1,1)[0].to_i).to eq(3)
     end
   end
 
   describe 'get_food_from_shopping_cart' do
-    xit 'given the shopping cart id and food id, returns the food id and quantity' do
+    it 'given the shopping cart id and food id, returns the food id and quantity' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_shopping_cart(1)
 
@@ -110,7 +114,8 @@ describe 'Orm' do
 
       Restaurant.orm.add_food_item(1,1,2)
 
-      expect(Restaurant.orm.get_food_from_shopping_cart(1,1)[0]).to eq(1)
+      # binding.pry
+      expect(Restaurant.orm.get_food_from_shopping_cart(1,1)[0].to_i).to eq(1)
     end
 
     xit 'returns false if no food matching the food is is in the shopping cart' do
@@ -122,7 +127,7 @@ describe 'Orm' do
   end
 
   describe '#remove_food_item' do
-    it 'removes a food item by id to a shopping cart with given id and returns true' do
+    xit 'removes a food item by id to a shopping cart with given id' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_shopping_cart(1)
 
@@ -191,7 +196,6 @@ describe 'Orm' do
       Restaurant.orm.add_food_item(1,1,4)
 
       Restaurant.orm.decrease_quantity_of_item(1,1,2)
-      # binding.pry
       expect(Restaurant.orm.list_items_in_shopping_cart(1)[0][4]).to eq(2)
     end
 
@@ -206,7 +210,7 @@ describe 'Orm' do
       expect(Restaurant.orm.decrease_quantity_of_item(1,1,5)).to eq(false)
     end
 
-    it 'removes an item from the shopping cart when the quantity is zero' do
+    xit 'removes an item from the shopping cart when the quantity is zero' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_shopping_cart(1)
 
@@ -246,14 +250,14 @@ describe 'Orm' do
 
 #### ORDER CLASS ####
   describe '#add_order' do
-    xit 'creates a new order and returns an array with order information' do
+    it 'creates a new order and returns an array with order information' do
       Restaurant.orm.create_customer("Benny")
       expect(Restaurant.orm.add_order(1)).to be_a(Array)
     end
   end
 
   describe '#get_order' do
-    xit 'retrieves an order, given an id, and returns an array with order information' do
+    it 'retrieves an order, given an id, and returns an array with order information' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_order(1)
 
@@ -263,7 +267,7 @@ describe 'Orm' do
   end
 
   describe '#list_orders' do
-    xit 'lists all orders and returns an array of arrays with order information' do
+    it 'lists all orders and returns an array of arrays with order information' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.create_customer("Caitlin")
 
@@ -271,6 +275,21 @@ describe 'Orm' do
       Restaurant.orm.add_order(2)
 
       expect(Restaurant.orm.list_orders.length).to eq(2)
+    end
+  end
+
+  describe '#submit_order' do
+    it 'submits all food items and quantities from the shopping_cart to the order' do
+      Restaurant.orm.create_customer("Benny")
+      Restaurant.orm.create_food("hamburger", 10, "entree")
+      Restaurant.orm.add_shopping_cart(1)
+      Restaurant.orm.add_food_item(1,1,4)
+
+      Restaurant.orm.add_order(1)
+
+      Restaurant.orm.submit_order(1,1)
+
+      expect(Restaurant.orm.list_items_in_order[0][0]).to eq(1)
     end
   end
 
@@ -283,7 +302,7 @@ describe 'Orm' do
   end
 
   describe '#mark_complete' do
-    xit 'updates the status of an order to closed given an order id' do
+    it 'updates the status of an order to closed given an order id' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_order(1)
 
@@ -292,7 +311,7 @@ describe 'Orm' do
   end
 
   describe '#list_open_orders' do
-    xit 'lists all orders with an open status and returns an array of arrays with order information' do
+    it 'lists all orders with an open status and returns an array of arrays with order information' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.create_customer("Caitlin")
 
@@ -306,7 +325,7 @@ describe 'Orm' do
   end
 
   describe '#list_closed_orders' do
-    xit 'lists all orders with a closed status and returns an array of arrays with order information' do
+    it 'lists all orders with a closed status and returns an array of arrays with order information' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.add_order(1)
 

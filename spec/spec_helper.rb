@@ -1,4 +1,5 @@
 require './lib/restaurant.rb'
+# require 'silent-postgres'
 
 
 RSpec.configure do |config|
@@ -13,4 +14,8 @@ RSpec.configure do |config|
   config.after(:all) do
     Restaurant.orm.drop_tables
   end
+
+  # config.before(:all) do
+  #   min_messages: WARNING
+  # end
 end
