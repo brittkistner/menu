@@ -11,7 +11,7 @@ class Restaurant::Food
 
   def self.get(id)
     result = Restaurant.orm.get_food(id)
-    Restaurant::Food.new(result[0],result[1],result[2],result[3])
+    result == nil ? nil : Restaurant::Food.new(result[0],result[1],result[2],result[3])
   end
 
   def self.add_food(name, price, type_of_item)

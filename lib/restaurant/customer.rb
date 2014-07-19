@@ -25,9 +25,8 @@ class Restaurant::Customer
     Restaurant::Shopping_Cart.create_shopping_cart(@id)
   end
 
-#call submit on the shopping cart for the order?
-  # def order
-  #   Restaurant::Order.create(@id)
+  # def submit
+
   # end
 
   #login,username, password, payment information

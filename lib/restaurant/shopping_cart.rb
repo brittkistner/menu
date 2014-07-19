@@ -45,8 +45,8 @@ class Restaurant::Shopping_Cart
 ##Need a method with a food instance + quantity
 
 
-  def decrease_quantity_of_item(fid)
-
+  def decrease_quantity_of_item(fid, quantity)
+    Restaurant.orm.decrease_quantity_of_item(@id, fid, quantity)
   end
 
   def total #totals order for customer prior to submitting

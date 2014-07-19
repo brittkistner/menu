@@ -20,10 +20,10 @@ describe 'Restaurant::Food' do
   end
 
   describe '.remove_food' do
-    xit 'removes a food item from the food list given a food id' do
+    it 'removes a food item from the food list given a food id' do
       Restaurant::Food.add_food("Coke", 2, "beverage")
       Restaurant::Food.remove_food(1)
-      expect(Restaurant::Food.get(1)).to eq([])
+      expect(Restaurant::Food.get(1)).to be_nil
     end
   end
 

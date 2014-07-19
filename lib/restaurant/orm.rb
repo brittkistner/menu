@@ -167,26 +167,26 @@ module Restaurant
       @db_adaptor.exec(command).values[0]
     end
 
-    def get_food_from_shopping_cart(scid, fid)
+    def get_food_quantity_from_shopping_cart(scid, fid)
       check_for_food = <<-SQL
-      SELECT item_id, item_quantity
+      SELECT item_quantity
       FROM shopping_cart_food AS scf
       WHERE item_id = '#{fid}'
       SQL
 
-      if @db_adaptor.exec(check_for_food).values[0][0].to_i == fid
-        @db_adaptor.exec(check_for_food).values[0]
+      if @db_adaptor.exec(check_for_food).values == []
+        0
       else
-        false
+        @db_adaptor.exec(check_for_food).values[0][0].to_i
       end
 
     end
 
     def add_food_item (scid, fid, quantity)
       check_for_food = <<-SQL
-      SELECT *
+      SELECT item_id
       FROM shopping_cart_food AS scf
-      WHERE item_id = '#{fid}'
+      WHERE item_id = '#{fid}' AND SCID = '#{scid}'
       SQL
       #Returns the item
 
@@ -201,11 +201,11 @@ module Restaurant
       VALUES ('#{scid}', '#{fid}', '#{quantity}');
       SQL
 
-      if @db_adaptor.exec(check_for_food).values[1] == fid
-        @db_adaptor.exec(update_food)
+      if @db_adaptor.exec(check_for_food).values == []
+        @db_adaptor.exec(add_food)
         true
       else
-        @db_adaptor.exec(add_food)
+        @db_adaptor.exec(update_food)
         true
       end
 
@@ -225,25 +225,15 @@ module Restaurant
 
     def decrease_quantity_of_item(scid, fid, quantity)
 
-      check_for_food = <<-SQL
-      SELECT item_id
-      FROM shopping_cart_food AS scf
-      WHERE item_id = '#{fid}'
-      SQL
-
-      return_quantity = <<-SQL
-      SELECT item_quantity
-      FROM shopping_cart_food AS scf
-      WHERE item_id = '#{fid}'
-      SQL
-
       update_food = <<-SQL
       UPDATE shopping_cart_food
       SET item_quantity = item_quantity - '#{quantity}'
       WHERE SCID = '#{scid}' AND item_id = '#{fid}'
       SQL
 
-      if @db_adaptor.exec(check_for_food).values == fid
+      if get_food_quantity_from_shopping_cart(scid, fid).values < quantity
+        return false
+      else
         db_quantity = @db_adaptor.exec(return_quantity).values[0][0]
         if db_quantity - quantity == 0
           Restaurant.orm.remove_food_item(scid,fid)
@@ -253,8 +243,6 @@ module Restaurant
           @db_adaptor.exec(update_food)
           true
         end
-      else
-        false
       end
 
     end

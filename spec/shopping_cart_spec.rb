@@ -48,8 +48,17 @@ describe 'Shopping_Cart' do
     end
   end
 
-  # describe '#food_quantity' do
-  # end
+  describe '#food_quantity' do
+    xit 'returns an array with the food_id and food_quantity when given a food_id' do
+      Restaurant::Customer.create_customer("Crissy")
+      Restaurant::Food.add_food("Coke", 2, "beverage")
+      cart = Restaurant::Shopping_Cart.create_shopping_cart(1)
+
+      cart.add_item(1,2)
+
+      expect(cart.food_quantity(1)[0]).to eq(1)
+    end
+  end
 
   describe '#decrease_quantity_of_item' do
     xit 'removes a food item from the shopping cart given a food id and quantity of food' do
@@ -110,6 +119,7 @@ describe 'Shopping_Cart' do
   #   end
   # end
 
-  # describe '#submit' do
-  # end
+  describe '#submit' do
+
+  end
 end
