@@ -22,8 +22,20 @@ def update_shopping_cart_remove_food(food_id, quantity)
     end
   end
 
-  def get_all_food_and_quantity #returns nested array? of food ids and quantities
-    result = Restaurant.orm
+  def get_all_food_and_quantity #returns list of [food_id, food_quantity]
+    result = Restaurant.orm.read_shopping_cart_foods(@id)
+
+    if result.nil?
+      return nil
+    else
+      list = []
+
+      result.each do |item|
+        list << [item[:food_id],item[:food_quantity]]
+      end
+
+      list
+    end
   end
 
 end

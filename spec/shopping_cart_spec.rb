@@ -66,7 +66,18 @@ describe 'Shopping_Cart' do
   end
 
   describe '#get_all_food_and_quantity' do
-    # FINISH
+    it 'returns list of food id and quantity for shopping cart' do
+      cust = Restaurant::Customer.create_customer("Crissy")
+      Restaurant::Food.create("Coke", 2, "beverage")
+      Restaurant::Food.create("Pepsi", 2, "beverage")
+
+      cart = cust.create_shopping_cart
+      cart.update_shopping_cart_add_food(1,2)
+      cart.update_shopping_cart_add_food(2,5)
+
+      expect(cart.get_all_food_and_quantity.length).to eq(2)
+      expect(cart.get_all_food_and_quantity[0][1]).to eq(2)
+    end
   end
 
 end
