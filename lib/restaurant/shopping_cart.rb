@@ -23,7 +23,7 @@ def update_shopping_cart_remove_food(food_id, quantity)
   end
 
   def get_all_food_and_quantity #returns nested array? of food ids and quantities
-    #FINISH
+    result = Restaurant.orm
   end
 
 end

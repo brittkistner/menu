@@ -28,9 +28,13 @@ it 'exists' do
   end
 
   describe '#get_all_shopping_carts' do
-    xit 'creates a new shopping cart instance' do
+    it 'creates a new shopping cart instance' do
       customer = Restaurant::Customer.create_customer("Crissy")
-      # FINISH
+      customer.create_shopping_cart
+      customer.create_shopping_cart
+
+      expect(customer.get_all_shopping_carts[0]).to be_a(Restaurant::Shopping_Cart)
+      expect(customer.get_all_shopping_carts.length).to eq(2)
     end
   end
 

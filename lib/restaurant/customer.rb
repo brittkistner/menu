@@ -24,14 +24,18 @@ class Restaurant::Customer
 
   def get_all_shopping_carts
     result = Restaurant.orm.read_customer_shopping_carts(@id)
-    #how will this be returned?
-    list = []
 
-    result.each do |shopping_cart|
-      list << Restaurant::Shopping_Cart.new(shopping_cart[:id], shopping_cart[:customer_id])
+    if result.nil?
+      return nil
+    else
+      list = []
+
+      result.each do |shopping_cart|
+        list << Restaurant::Shopping_Cart.new(shopping_cart[:id], shopping_cart[:customer_id])
+      end
+
+      list
     end
-
-    list
   end
 
 end

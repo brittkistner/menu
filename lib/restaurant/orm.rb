@@ -156,7 +156,7 @@ module Restaurant
       RETURNING id;
       SQL
 
-      row = @db_adaptor.exec(command).values[0] #returns ['id']
+      row = @db_adaptor.exec(command).values[0]
 
       {id: Integer(row[0])}
     end
@@ -191,9 +191,19 @@ module Restaurant
       FROM shopping_carts;
       SQL
 
-      row = @db_adaptor.exec(command).values #return nested arrays with id, customer_id
+      table = @db_adaptor.exec(command).values
 
-      {id: Integer(row[0]), customer_id: Integer(row[1])}
+      if table.empty?
+        return nil
+      else
+        list = []
+
+        table.each do |x|
+          list << {id: Integer(x[0]), customer_id: Integer(x[1])}
+        end
+      end
+
+      list
     end
 
   # #####################

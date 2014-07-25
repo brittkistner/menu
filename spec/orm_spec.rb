@@ -69,7 +69,7 @@ describe 'Orm' do
   end
 
   describe 'read_customer_shopping_carts' do
-    xit 'looks up all customer shopping carts and returns an array with shopping cart id and customer id' do
+    it 'looks up all customer shopping carts and returns an array with shopping cart id and customer id' do
       Restaurant.orm.create_customer("Benny")
       Restaurant.orm.update_customer_add_shopping_cart(1)
       Restaurant.orm.update_customer_add_shopping_cart(1)
