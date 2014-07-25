@@ -2,124 +2,71 @@ require 'spec_helper.rb'
 require 'pry-byebug'
 
 describe 'Shopping_Cart' do
-  describe '.create_shopping_cart' do
-    it 'creates a new instance of Restaurant::Shopping_Cart given a customer_id' do
-      Restaurant::Customer.create_customer("Crissy")
-      expect(Restaurant::Shopping_Cart.create_shopping_cart(1)).to be_a(Restaurant::Shopping_Cart)
+
+  describe '#read_shopping_cart_food_quantity' do
+    it 'returns food_quantity when given a food id' do
+      cust = Restaurant::Customer.create_customer("Crissy")
+      Restaurant::Food.create("Coke", 2, "beverage")
+
+      cart = cust.create_shopping_cart
+      cart.update_shopping_cart_add_food(1,2)
+
+      expect(cart.read_shopping_cart_food_quantity(1)).to eq(2)
     end
   end
 
-  describe '.get' do
-    it 'retrieves a Restaurant::Shopping_Cart instance given an id' do
-      Restaurant::Customer.create_customer("Crissy")
-      Restaurant::Shopping_Cart.create_shopping_cart(1)
-
-      expect(Restaurant::Shopping_Cart.get(1)).to be_a(Restaurant::Shopping_Cart)
-    end
-  end
-
-  describe '#add_item' do
+  describe '#update_shopping_cart_add_food' do
     it 'adds a food item to the shopping cart given a food id and quantity of food' do
-      Restaurant::Customer.create_customer("Crissy")
-      Restaurant::Food.add_food("Coke", 2, "beverage")
-      cart = Restaurant::Shopping_Cart.create_shopping_cart(1)
+      cust = Restaurant::Customer.create_customer("Crissy")
+      Restaurant::Food.create("Coke", 2, "beverage")
 
-      expect(cart.list_items[0]).to eq(nil)
+      cart = cust.create_shopping_cart
+      cart.update_shopping_cart_add_food(1,2)
 
-      cart.add_item(1,2)
-
-      expect(cart.list_items[0]).to be_a(Restaurant::Food)
+      expect(cart.read_shopping_cart_food_quantity(1)).to eq(2)
     end
 
-    xit 'increases the quantity of a food item which is already in the shopping cart' do
-      Restaurant::Customer.create_customer("Crissy")
-      Restaurant::Food.add_food("Coke", 2, "beverage")
-      cart = Restaurant::Shopping_Cart.create_shopping_cart(1)
+    it 'increases the quantity of a food item which is already in the shopping cart' do
+      cust = Restaurant::Customer.create_customer("Crissy")
+      Restaurant::Food.create("Coke", 2, "beverage")
 
-      cart.add_item(1,2)
+      cart = cust.create_shopping_cart
+      cart.update_shopping_cart_add_food(1,2)
+      expect(cart.read_shopping_cart_food_quantity(1)).to eq(2)
 
-      # binding.pry
-
-      expect(cart.food_quantity(1)[1]).to eq(2)
-
-      cart.add_item(1,1)
-
-      expect(cart.food_quantity(1)[1]).to eq(3)
+      cart.update_shopping_cart_add_food(1,2)
+      expect(cart.read_shopping_cart_food_quantity(1)).to eq(4)
     end
   end
 
-  describe '#food_quantity' do
-    xit 'returns an array with the food_id and food_quantity when given a food_id' do
-      Restaurant::Customer.create_customer("Crissy")
-      Restaurant::Food.add_food("Coke", 2, "beverage")
-      cart = Restaurant::Shopping_Cart.create_shopping_cart(1)
+  describe '#update_shopping_cart_remove_food' do
+    it 'removes a food item from the shopping cart given a food id and quantity of food' do
+      cust = Restaurant::Customer.create_customer("Crissy")
+      Restaurant::Food.create("Coke", 2, "beverage")
 
-      cart.add_item(1,2)
+      cart = cust.create_shopping_cart
+      cart.update_shopping_cart_add_food(1,2)
+      expect(cart.read_shopping_cart_food_quantity(1)).to eq(2)
 
-      expect(cart.food_quantity(1)[0]).to eq(1)
+      cart.update_shopping_cart_remove_food(1,1)
+      expect(cart.read_shopping_cart_food_quantity(1)).to eq(1)
+    end
+
+    it 'will not allow customer to decrease item below zero, will remove food item instead' do
+      cust = Restaurant::Customer.create_customer("Crissy")
+      Restaurant::Food.create("Coke", 2, "beverage")
+
+      cart = cust.create_shopping_cart
+      cart.update_shopping_cart_add_food(1,2)
+      expect(cart.read_shopping_cart_food_quantity(1)).to eq(2)
+
+      cart.update_shopping_cart_remove_food(1,3)
+      expect(cart.read_shopping_cart_food_quantity(1)).to eq(0)
     end
   end
 
-  describe '#decrease_quantity_of_item' do
-    xit 'removes a food item from the shopping cart given a food id and quantity of food' do
-      Restaurant::Customer.create_customer("Crissy")
-      Restaurant::Food.add_food("Coke", 2, "beverage")
-      cart = Restaurant::Shopping_Cart.create_shopping_cart(1)
-      cart.add_item(1,2)
-
-      expect(cart.food_quantity(1)[1]).to eq(2)
-
-      cart.remove_item(1,1)
-
-      expect(cart.food_quantity(1)[1]).to eq(1)
-    end
-
-    xit 'will not allow user to decrease item below zero' do
-      Restaurant::Customer.create_customer("Crissy")
-      Restaurant::Food.add_food("Coke", 2, "beverage")
-      cart = Restaurant::Shopping_Cart.create_shopping_cart(1)
-      cart.add_item(1,2)
-
-      expect(cart.food_quantity(1)[1]).to eq(2)
-
-      cart.remove_item(1,1)
-
-      expect(cart.food_quantity(1)[1]).to eq(1)  ##WHAT SHOULD THIS RETURN??
-    end
-
-    xit 'will remove item from shopping cart if food quantity is zero' do
-      Restaurant::Customer.create_customer("Crissy")
-      Restaurant::Food.add_food("Coke", 2, "beverage")
-      cart = Restaurant::Shopping_Cart.create_shopping_cart(1)
-      cart.add_item(1,2)
-
-      expect(cart.food_quantity(1)[1]).to eq(2)
-
-      cart.remove_item(1,2)
-
-      expect(cart.food_quantity(1)[1]).to eq(1) ##RETURN FALSE???
-    end
+  describe '#get_all_food_and_quantity' do
+    # FINISH
   end
 
-  describe 'list_items' do
-    xit 'returns an array of food items in the shopping cart' do
-      Restaurant::Customer.create_customer("Crissy")
-      cart = Restaurant::Shopping_Cart.create_shopping_cart(1)
-      Restaurant::Food.add_food("Coke", 2, "beverage")
-      cart.add_item(1,2)
-
-      expect(cart.list_items[0]).to be_a(Restaurant::Food)
-    end
-  end
-
-  # describe '#total' do
-  #   xit 'totals the shopping cart' do
-  #     Restaurant::Customer.create_customer("Crissy")
-  #     Restaurant::Shopping_Cart.create_shopping_cart(1)
-  #   end
-  # end
-
-  describe '#submit' do
-
-  end
 end

@@ -3,34 +3,37 @@ class Restaurant::Food
   attr_reader :id, :name, :price, :type_of_item
 
   def initialize(id, name, price, type_of_item)
-    @id = Integer(id)
+    @id = id
     @name = name
-    @price = Integer(price)
+    @price = price
     @type_of_item = type_of_item
   end
 
-  def self.get(id)
-    result = Restaurant.orm.get_food(id)
-    result == nil ? nil : Restaurant::Food.new(result[0],result[1],result[2],result[3])
-  end
-
-  def self.add_food(name, price, type_of_item)
+  def self.create(name, price, type_of_item)
     result = Restaurant.orm.create_food(name,price,type_of_item)
-    Restaurant::Food.new(result[0],result[1],result[2],result[3])
+    Restaurant::Food.new(result[:id],result[:name],result[:price],result[:type_of_item])
   end
 
-  def self.remove_food(id)
-    Restaurant.orm.remove_food(id)
+  def self.get(id)
+    result = Restaurant.orm.read_food_by_id(id)
+    result == nil ? nil : Restaurant::Food.new(result[:id],result[:name],result[:price],result[:type_of_item])
   end
 
-  def self.list
-    result = Restaurant.orm.list_all_food
+  def self.get_all
+    result = Restaurant.orm.read_foods
     list = []
 
     result.each do |item|
-      list << Restaurant::Food.new(item[0],item[1],item[2],item[3])
+      list << Restaurant::Food.new(result[:id],result[:name],result[:price],result[:type_of_item])
     end
 
     list
   end
+
+  def self.delete_food(id)
+    Restaurant.orm.delete_food(id) #returns true
+  end
+
+
 end
+

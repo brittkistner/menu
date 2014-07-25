@@ -2,7 +2,7 @@ require 'spec_helper.rb'
 require 'pry-byebug'
 
 describe 'Restuarant::Customer' do
-  it 'exists' do
+it 'exists' do
     expect(Restaurant::Customer).to be_a(Class)
   end
 
@@ -20,18 +20,17 @@ describe 'Restuarant::Customer' do
     end
   end
 
-  describe '#get_menu' do
-    it 'retrives a menu instance given a menu id' do
+  describe '#create_shopping_cart' do
+    it 'creates a new shopping cart instance' do
       customer = Restaurant::Customer.create_customer("Crissy")
-      Restaurant::Menu.create_menu("lunch")
-      expect(customer.get_menu(1)).to be_a(Restaurant::Menu)
+      expect(customer.create_shopping_cart).to be_a(Restaurant::Shopping_Cart)
     end
   end
 
-  describe '#get_shopping_cart' do
-    it 'creates a new shopping cart instance' do
+  describe '#get_all_shopping_carts' do
+    xit 'creates a new shopping cart instance' do
       customer = Restaurant::Customer.create_customer("Crissy")
-      expect(customer.get_shopping_cart).to be_a(Restaurant::Shopping_Cart)
+      # FINISH
     end
   end
 

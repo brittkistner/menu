@@ -3,32 +3,35 @@ class Restaurant::Customer
   attr_reader :id, :name
 
   def initialize(id, name)
-    @id = Integer(id)
+    @id = id
     @name = name
-  end
-
-  def self.get(id)
-    result = Restaurant.orm.get_customer(id)
-    Restaurant::Customer.new(result[0],result[1])
   end
 
   def self.create_customer(name)
     result = Restaurant.orm.create_customer(name)
-    Restaurant::Customer.new(result[0], result[1])
+    Restaurant::Customer.new(result[:id],name)
   end
 
-  def get_menu(mid)
-    Restaurant::Menu.get(mid)
+  def self.get(id)
+    result = Restaurant.orm.read_customer(id)
+    Restaurant::Customer.new(id,result[:name])
   end
 
-  def get_shopping_cart
-    Restaurant::Shopping_Cart.create_shopping_cart(@id)
+  def create_shopping_cart
+    result = Restaurant.orm.update_customer_add_shopping_cart(@id)
+    Restaurant::Shopping_Cart.new(result[:id], @id)
   end
 
-  # def submit
+  def get_all_shopping_carts
+    result = Restaurant.orm.read_customer_shopping_carts(@id)
+    #how will this be returned?
+    list = []
 
-  # end
+    result.each do |shopping_cart|
+      list << Restaurant::Shopping_Cart.new(shopping_cart[:id], shopping_cart[:customer_id])
+    end
 
-  #login,username, password, payment information
+    list
+  end
 
 end

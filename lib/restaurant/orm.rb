@@ -15,9 +15,9 @@ module Restaurant
         name TEXT
         );
       CREATE TABLE IF NOT EXISTS orders(
-        id INTEGER REFERENCES orders_food(order_id),
-        customer_id INTEGER REFERENCES customers(id),
+        id SERIAL,
         PRIMARY KEY (id),
+        customer_id INTEGER REFERENCES customers(id),
         creation_time TIMESTAMP,
         status TEXT
         );
@@ -29,7 +29,7 @@ module Restaurant
         type_of_item TEXT
         );
       CREATE TABLE IF NOT EXISTS orders_foods(
-        order_id SERIAL,
+        order_id INTEGER REFERENCES orders(id),
         PRIMARY KEY (order_id),
         food_id INTEGER REFERENCES foods(id),
         food_quantity INTEGER
@@ -40,7 +40,7 @@ module Restaurant
         PRIMARY KEY (id)
         );
       CREATE TABLE IF NOT EXISTS shopping_cart_foods(
-        SCID INTEGER REFERENCES shopping_cart(id),
+        SCID INTEGER REFERENCES shopping_carts(id),
         food_id INTEGER REFERENCES foods(id),
         food_quantity INTEGER
         );
@@ -84,26 +84,31 @@ module Restaurant
       create_tables
     end
 
-  ##################
-  ####Food Class####
-  ##################
+  #   ##################
+  #   ####Food Class####
+  #   ##################
     def create_food(name, price, type_of_item)
       command = <<-SQL
       INSERT INTO foods (name, price, type_of_item)
       VALUES ('#{name}', '#{price}','#{type_of_item}')
-      RETURNING *;
+      RETURNING id, name, price, type_of_item;
       SQL
 
-      @db_adaptor.exec(command).values[0]
+      row = @db_adaptor.exec(command).values[0]
+
+      {id: Integer(row[0]), name: row[1], price: Integer(row[2]), type_of_item: row[3]}
     end
 
     def read_food_by_id(id)
       command = <<-SQL
-      SELECT * FROM foods
+      SELECT id, name, price, type_of_item
+      FROM foods
       WHERE id = '#{id}';
       SQL
 
-      @db_adaptor.exec(command).values[0]
+      row = @db_adaptor.exec(command).values[0]
+
+      {id: Integer(row[0]), name: row[1], price: Integer(row[2]), type_of_item: row[3]}
     end
 
     def delete_food(id)
@@ -114,6 +119,8 @@ module Restaurant
       SQL
 
       @db_adaptor.exec(command)
+
+      true
     end
 
     def read_foods
@@ -121,7 +128,7 @@ module Restaurant
       SELECT * FROM foods;
       SQL
 
-      @db_adaptor.exec(command).values
+      row = @db_adaptor.exec(command).values #returns nested array
     end
 
   # ###############
@@ -135,16 +142,21 @@ module Restaurant
       RETURNING id;
       SQL
 
-      @db_adaptor.exec(command).values[0] #returns ['id']
+      row = @db_adaptor.exec(command).values[0] #returns ['id']
+
+      {id: Integer(row[0])}
     end
 
     def read_customer(id)
       command = <<-SQL
-      SELECT * FROM customers
+      SELECT name
+      FROM customers
       WHERE id = '#{id}';
       SQL
 
-      @db_adaptor.exec(command).values[0] #returns ['id',name]
+      row = @db_adaptor.exec(command).values[0]
+
+      {name: row[0]}
     end
 
     def update_customer_add_shopping_cart(id)
@@ -154,15 +166,20 @@ module Restaurant
       RETURNING id;
       SQL
 
-      @db_adaptor.exec(command).values[0][0].to_i
+      row = @db_adaptor.exec(command).values[0]
+
+      {id: Integer(row[0])}
     end
 
     def read_customer_shopping_carts(id)
       command = <<-SQL
-      SELECT * FROM shopping_carts;
+      SELECT id, customer_id
+      FROM shopping_carts;
       SQL
 
-      @db_adaptor.exec(command).values #returns an array with id, customer_id
+      row = @db_adaptor.exec(command).values #return nested arrays with id, customer_id
+
+      {id: Integer(row[0]), customer_id: Integer(row[1])}
     end
 
   # #####################
@@ -173,29 +190,28 @@ module Restaurant
       check_for_food = <<-SQL
       SELECT food_quantity
       FROM shopping_cart_foods
-      WHERE item_id = '#{food_id}' AND SCID = '#{shopping_cart_id';
+      WHERE food_id = '#{food_id}' AND SCID = '#{shopping_cart_id}';
       SQL
 
-      if @db_adaptor.exec(check_for_food).values == []
+      if @db_adaptor.exec(check_for_food).values.empty?
         0
       else
-        @db_adaptor.exec(check_for_food).values[0][0].to_i #returns a number
+        row = @db_adaptor.exec(check_for_food).values[0]
+        {food_quantity: Integer(row[0])}
       end
-
     end
 
     def update_shopping_cart_add_food(shopping_cart_id, food_id, quantity)
       check_for_food = <<-SQL
       SELECT item_id
       FROM shopping_cart_foods AS scf
-      WHERE item_id = '#{fid}' AND SCID = '#{scid}';
+      WHERE food_id = '#{food_id}' AND SCID = '#{shopping_cart_id}';
       SQL
-      #Returns the item
 
       update_food = <<-SQL
       UPDATE shopping_cart_foods
       SET food_quantity = food_quantity + '#{quantity}'
-      WHERE SCID = '#{shopping_cart_id}' AND food_id = '#{fid}';
+      WHERE SCID = '#{shopping_cart_id}' AND food_id = '#{food_id}';
       SQL
 
       add_food = <<-SQL
@@ -216,23 +232,24 @@ module Restaurant
       delete_food = <<-SQL
       DELETE
       FROM shopping_cart_foods
-      WHERE SCID = '#{scid}' AND item_id = '#{fid}';
+      WHERE SCID = '#{shopping_cart_id}' AND food_id = '#{food_id}';
       SQL
 
       update_food = <<-SQL
       UPDATE shopping_cart_foods
-      SET item_quantity = item_quantity - '#{quantity}'
-      WHERE SCID = '#{scid}' AND item_id = '#{fid}';
+      SET food_quantity = food_quantity - '#{quantity}'
+      WHERE SCID = '#{shopping_cart_id}' AND food_id = '#{food_id}';
       SQL
 
-      current_quantity = read_shopping_cart_food_quantity(shopping_cart_id, food_id)
+      current_quantity = read_shopping_cart_food_quantity(shopping_cart_id, food_id)[:food_quantity]
       if current_quantity == 0
         return false
       elsif current_quantity - quantity == 0
-        @db_quantity.exec(delete_food)
+        @db_adaptor.exec(delete_food)
         true
       elsif current_quantity - quantity < 0
-        false
+        @db_adaptor.exec(delete_food)
+        true
       else
         @db_adaptor.exec(update_food)
         true
@@ -246,12 +263,12 @@ module Restaurant
       WHERE SCID = '#{id}';
       SQL
 
-      @db_adaptor.exec(command).values #[[food_id1, quantity1],[food_id2, quantity2]]
+      row = @db_adaptor.exec(command).values #[[food_id1, quantity1],[food_id2, quantity2]]
     end
 
-  # ###########
-  # #Menu Class
-  # ###########
+    # ###########
+    # #Menu Class
+    # ###########
 
     def create_menu(name)
       command = <<-SQL
@@ -260,7 +277,9 @@ module Restaurant
       RETURNING id;
       SQL
 
-      @db_adaptor.exec(command).values[0] #returns ['id']
+      row = @db_adaptor.exec(command).values[0] #returns ['id']
+
+      {id: Integer(row[0])}
     end
 
     def read_menus
@@ -268,7 +287,7 @@ module Restaurant
       SELECT * FROM menus;
       SQL
 
-      @db_adaptor.exec(command).values
+      row = @db_adaptor.exec(command).values
     end
 
     def add_menus_food(menu_id, food_id)
@@ -288,21 +307,21 @@ module Restaurant
       WHERE menu_id = '#{menu_id}';
       SQL
 
-      @db_adaptor.exec(command).values #[['food1'],['food2']]
+      row = @db_adaptor.exec(command).values #[['food1'],['food2']]
     end
 
-  # ############
-  # #Order Class
-  # ############
+    # ############
+    # #Order Class
+    # ############
 
-    # def add_order(customer_id)
-    #   status = "open"
-    #   creation_time = Time.now
-    #   command = <<-SQL
-    #   INSERT INTO Orders (customer_id, creation_time, status)
-    #   VALUES ('#{customer_id}', '#{creation_time}', '#{status}')
-    #   RETURNING *;
-    #   SQL
+      # def add_order(customer_id)
+      #   status = "open"
+      #   creation_time = Time.now
+      #   command = <<-SQL
+      #   INSERT INTO Orders (customer_id, creation_time, status)
+      #   VALUES ('#{customer_id}', '#{creation_time}', '#{status}')
+      #   RETURNING *;
+      #   SQL
 
 
     def create_order_delete_shopping_cart(shopping_cart_id)
@@ -339,11 +358,11 @@ module Restaurant
 
     def read_orders_by_status
       command = <<-SQL
-      SELECT id AND status
+      SELECT id,status
       FROM orders;
       SQL
 
-      @db_adaptor.exec(command).values #array(dict) (order_id, status)
+      row = @db_adaptor.exec(command).values #array(dict) (order_id, status)
     end
 
     def mark_complete(id,status)
@@ -365,12 +384,13 @@ module Restaurant
       WHERE order_id = '#{id}';
       SQL
 
-      @db_adaptor.exec(command).values
+      row = @db_adaptor.exec(command).values #nested arrays
+
     end
 
-  ############
-  #Staff Class
-  ############
+    ############
+    #Staff Class
+    ############
     def create_staff(name)
       command = <<-SQL
       INSERT INTO staff(name)
@@ -378,13 +398,17 @@ module Restaurant
       RETURNING id;
       SQL
 
-      @db_adaptor.exec(command).values[0] #['id']
-    end
+      row = @db_adaptor.exec(command).values[0] #['id']
 
+      hash = {id: Integer(row[0])}
+    end
   end
 
   def self.orm
    @__orm_instance ||= Orm.new
   end
-
 end
+
+
+
+
