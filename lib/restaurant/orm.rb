@@ -34,12 +34,12 @@ module Restaurant
         food_id INTEGER REFERENCES foods(id),
         food_quantity INTEGER
         );
-      CREATE TABLE IF NOT EXISTS shopping_cart(
+      CREATE TABLE IF NOT EXISTS shopping_carts(
         id SERIAL,
         customer_id INTEGER REFERENCES customers(id),
         PRIMARY KEY (id)
         );
-      CREATE TABLE IF NOT EXISTS shopping_cart_food(
+      CREATE TABLE IF NOT EXISTS shopping_cart_foods(
         SCID INTEGER REFERENCES shopping_cart(id),
         food_id INTEGER REFERENCES foods(id),
         food_quantity INTEGER
@@ -67,10 +67,10 @@ module Restaurant
       command = <<-SQL
         DROP TABLE IF EXISTS orders CASCADE;
         DROP TABLE IF EXISTS customers CASCADE;
-        DROP TABLE IF EXISTS food CASCADE;
+        DROP TABLE IF EXISTS foods CASCADE;
         DROP TABLE IF EXISTS orders_foods CASCADE;
-        DROP TABLE IF EXISTS shopping_cart CASCADE;
-        DROP TABLE IF EXISTS shopping_cart_food CASCADE;
+        DROP TABLE IF EXISTS shopping_carts CASCADE;
+        DROP TABLE IF EXISTS shopping_cart_foods CASCADE;
         DROP TABLE IF EXISTS menus CASCADE;
         DROP TABLE IF EXISTS menus_food CASCADE;
         DROP TABLE IF EXISTS staff CASCADE;
@@ -89,7 +89,7 @@ module Restaurant
   ##################
     def create_food(name, price, type_of_item)
       command = <<-SQL
-      INSERT INTO food (name, price, type_of_item)
+      INSERT INTO foods (name, price, type_of_item)
       VALUES ('#{name}', '#{price}','#{type_of_item}')
       RETURNING *;
       SQL
@@ -97,28 +97,28 @@ module Restaurant
       @db_adaptor.exec(command).values[0]
     end
 
-    def get_food(id) # * read_food_by_id(id) -> dict (hash)
+    def read_food_by_id(id)
       command = <<-SQL
-      SELECT * FROM food
+      SELECT * FROM foods
       WHERE id = '#{id}';
       SQL
 
       @db_adaptor.exec(command).values[0]
     end
 
-    def remove_food(id) #delete_food
+    def delete_food(id)
       command = <<-SQL
       DELETE
-      FROM food
+      FROM foods
       WHERE id = '#{id}';
       SQL
 
       @db_adaptor.exec(command)
     end
 
-    def list_all_food # * read_foods -> array(dict)
+    def read_foods
       command = <<-SQL
-      SELECT * FROM food;
+      SELECT * FROM foods;
       SQL
 
       @db_adaptor.exec(command).values
@@ -128,134 +128,125 @@ module Restaurant
   # #Customer Class
   # ###############
 
-# * read_customer_shopping_carts(id) -> array(dict)
-    def get_customer(id) # * read_customer(id) -> dict
+    def create_customer(name)
+      command = <<-SQL
+      INSERT INTO customers (name)
+      VALUES ('#{name}')
+      RETURNING id;
+      SQL
+
+      @db_adaptor.exec(command).values[0] #returns ['id']
+    end
+
+    def read_customer(id)
       command = <<-SQL
       SELECT * FROM customers
       WHERE id = '#{id}';
       SQL
 
-      @db_adaptor.exec(command).values[0] #returns [id,name]
+      @db_adaptor.exec(command).values[0] #returns ['id',name]
     end
 
-    def create_customer(name) # * create_customer(name) -> integer (id)
+    def update_customer_add_shopping_cart(id)
       command = <<-SQL
-      INSERT INTO customers (name)
-      VALUES ('#{name}')
-      RETURNING *;
+      INSERT INTO shopping_carts (customer_id)
+      VALUES ('#{id}')
+      RETURNING id;
       SQL
 
-      @db_adaptor.exec(command).values[0] #returns [id,name]
+      @db_adaptor.exec(command).values[0][0].to_i
     end
 
-    # * update_customer_add_shopping_cart(id) -> integer (id) LOOK BELOW TODO
+    def read_customer_shopping_carts(id)
+      command = <<-SQL
+      SELECT * FROM shopping_carts;
+      SQL
 
-    # * read_customer_shopping_carts(id) -> array(dict) TODO
+      @db_adaptor.exec(command).values #returns an array with id, customer_id
+    end
 
   # #####################
   # #Shopping Cart Class
   # #####################
 
-    def add_shopping_cart(customer_id)
-      command = <<-SQL
-      INSERT INTO shopping_cart (customer_id)
-      VALUES ('#{customer_id}')
-      RETURNING *;
-      SQL
-
-      @db_adaptor.exec(command).values[0]
-    end
-
-    def get_food_quantity_from_shopping_cart(scid, fid) # * read_shopping_cart_food_quantity(shopping_cart_id, food_id) -> integer (quantity)
+    def read_shopping_cart_food_quantity(shopping_cart_id, food_id)
       check_for_food = <<-SQL
-      SELECT item_quantity
-      FROM shopping_cart_food AS scf
-      WHERE item_id = '#{fid}'
+      SELECT food_quantity
+      FROM shopping_cart_foods
+      WHERE item_id = '#{food_id}' AND SCID = '#{shopping_cart_id';
       SQL
 
       if @db_adaptor.exec(check_for_food).values == []
         0
       else
-        @db_adaptor.exec(check_for_food).values[0][0].to_i
+        @db_adaptor.exec(check_for_food).values[0][0].to_i #returns a number
       end
 
     end
 
-    def add_food_item (scid, fid, quantity)  # * update_shopping_cart_add_food(shopping_cart_id, food_id, quantity) -> boolean
+    def update_shopping_cart_add_food(shopping_cart_id, food_id, quantity)
       check_for_food = <<-SQL
       SELECT item_id
-      FROM shopping_cart_food AS scf
-      WHERE item_id = '#{fid}' AND SCID = '#{scid}'
+      FROM shopping_cart_foods AS scf
+      WHERE item_id = '#{fid}' AND SCID = '#{scid}';
       SQL
       #Returns the item
 
       update_food = <<-SQL
-      UPDATE shopping_cart_food
-      SET item_quantity = item_quantity + '#{quantity}'
-      WHERE SCID = '#{scid}' AND item_id = '#{fid}'
+      UPDATE shopping_cart_foods
+      SET food_quantity = food_quantity + '#{quantity}'
+      WHERE SCID = '#{shopping_cart_id}' AND food_id = '#{fid}';
       SQL
 
       add_food = <<-SQL
-      INSERT INTO shopping_cart_food (SCID, item_id, item_quantity)
-      VALUES ('#{scid}', '#{fid}', '#{quantity}');
+      INSERT INTO shopping_cart_foods (SCID, food_id, food_quantity)
+      VALUES ('#{shopping_cart_id}', '#{food_id}', '#{quantity}');
       SQL
 
-      if @db_adaptor.exec(check_for_food).values == []
+      if read_shopping_cart_food_quantity(shopping_cart_id, food_id) == 0
         @db_adaptor.exec(add_food)
         true
       else
         @db_adaptor.exec(update_food)
         true
       end
-
     end
 
-    # def remove_food_item (scid, fid)
-    #   command = <<-SQL
-    #   DELETE
-    #   FROM shopping_cart_food
-    #   WHERE SCID = '#{scid}' AND item_id = '#{fid}';
-    #   SQL
-
-    #   @db_adaptor.exec(command)
-
-    #   true
-    # end
-
-    def decrease_quantity_of_item(scid, fid, quantity) # * update_shopping_cart_remove_food(shopping_cart_id, food_id, quantity) -> boolean
+    def update_shopping_cart_remove_food(shopping_cart_id, food_id, quantity)
+      delete_food = <<-SQL
+      DELETE
+      FROM shopping_cart_foods
+      WHERE SCID = '#{scid}' AND item_id = '#{fid}';
+      SQL
 
       update_food = <<-SQL
-      UPDATE shopping_cart_food
+      UPDATE shopping_cart_foods
       SET item_quantity = item_quantity - '#{quantity}'
-      WHERE SCID = '#{scid}' AND item_id = '#{fid}'
+      WHERE SCID = '#{scid}' AND item_id = '#{fid}';
       SQL
 
-      if get_food_quantity_from_shopping_cart(scid, fid).values < quantity
+      current_quantity = read_shopping_cart_food_quantity(shopping_cart_id, food_id)
+      if current_quantity == 0
         return false
+      elsif current_quantity - quantity == 0
+        @db_quantity.exec(delete_food)
+        true
+      elsif current_quantity - quantity < 0
+        false
       else
-        db_quantity = @db_adaptor.exec(return_quantity).values[0][0]
-        if db_quantity - quantity == 0
-          Restaurant.orm.remove_food_item(scid,fid)
-        elsif db_quantity - quantity < 0
-          false
-        else
-          @db_adaptor.exec(update_food)
-          true
-        end
+        @db_adaptor.exec(update_food)
+        true
       end
-
     end
 
-    def list_items_in_shopping_cart(scid) # * read_shopping_cart_foods(id) -> array(dict) (food_id, quantity)
+    def read_shopping_cart_foods(id)
       command = <<-SQL
-      SELECT f.id, f.name, f.price, f.type_of_item, scf.item_quantity
-      FROM shopping_cart_food AS scf
-      JOIN food AS f
-      ON scf.item_id = f.id
-      WHERE scf.scid= '#{scid}';
+      SELECT food_id, food_quantity
+      FROM shopping_cart_food
+      WHERE SCID = '#{id}';
       SQL
 
-      @db_adaptor.exec(command).values
+      @db_adaptor.exec(command).values #[[food_id1, quantity1],[food_id2, quantity2]]
     end
 
   # ###########

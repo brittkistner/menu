@@ -25,26 +25,26 @@ describe 'Orm' do
     end
   end
 
-  describe '#get_food' do
+  describe '#read_food_by_id' do
     it 'looks up a food tuple by id and returns an array with the food information' do
       Restaurant.orm.create_food("hamburger", 10,"entree")
-      expect(Restaurant.orm.get_food(1)).to be_a(Array)
+      expect(Restaurant.orm.read_food_by_id(1)).to be_a(Array)
     end
   end
 
-  describe '#remove_food' do
+  describe '#delete_food' do
     it 'removes a tuple from the food table and returns true' do
       Restaurant.orm.create_food("hamburger", 10, "entree")
-      Restaurant.orm.remove_food(1)
-      expect(Restaurant.orm.get_food(1)).to be_nil
+      Restaurant.orm.delete_food(1)
+      expect(Restaurant.orm.read_food_by_id(1)).to be_nil
     end
   end
 
-  describe '#list_all_food' do
+  describe '#read_foods' do
     it 'retrieves all information from the food table and returns as an array of arrays' do
       Restaurant.orm.create_food("hamburger", 10, "entree")
       Restaurant.orm.create_food("burrito", 8, "entree")
-      expect(Restaurant.orm.list_all_food.length).to eq(2)
+      expect(Restaurant.orm.read_foods.length).to eq(2)
     end
   end
 
@@ -55,171 +55,106 @@ describe 'Orm' do
     end
   end
 
-  describe '#get_customer' do
+  describe '#read_customer' do
     it 'looks up a customer tuple by id and returns an array with the customer information' do
       Restaurant.orm.create_customer("Benny")
-      expect(Restaurant.orm.get_customer(1)).to be_a(Array)
+      expect(Restaurant.orm.read_customer(1)).to be_a(Array)
+    end
+  end
+
+  describe 'update_customer_add_shopping_cart' do
+    it 'adds a shopping cart given a customer id and returns the shopping cart id' do
+    end
+  end
+
+  describe 'read_customer_shopping_carts' do
+    it 'looks up all customer shopping carts and returns an array with shopping cart id and customer id' do
     end
   end
 
   ####SHOPPING_CART CLASS####
-  describe '#add_shopping_cart'do
-    it 'adds a tuple to the shopping_cart table and returns an array with the shopping_cart information' do
-      Restaurant.orm.create_customer("Benny")
-      expect(Restaurant.orm.add_shopping_cart(1)).to be_a(Array)
-    end
-  end
 
-  describe '#get_shopping_cart' do
-    it 'looks up a shopping_cart tuple by id and returns an array with the shopping_cart information' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
-      expect(Restaurant.orm.get_shopping_cart(1)).to be_a(Array)
-      expect(Restaurant.orm.get_shopping_cart(1).length).to eq(2)
-    end
-  end
+  describe 'read_shopping_cart_food_quantity' do
+    xit 'given the shopping cart id and food id, returns the food id and quantity' do
+      # Restaurant.orm.create_customer("Benny")
+      # Restaurant.orm.add_shopping_cart(1)
 
-  describe '#add_food_item' do
-    it 'adds a food item by id, with a specified quantity to a shopping cart with given id and returns true' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
+      # Restaurant.orm.create_food("hamburger", 10, "entree")
 
-      Restaurant.orm.create_food("hamburger", 10, "entree")
+      # Restaurant.orm.add_food_item(1,1,2)
 
-      expect(Restaurant.orm.add_food_item(1,1,2)).to eq(true)
-    end
-
-    it 'updates a food item by id, with a specified quantity to a shopping cart with given id and returns true' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
-
-      Restaurant.orm.create_food("hamburger", 10, "entree")
-
-      Restaurant.orm.add_food_item(1,1,2)
-
-      expect(Restaurant.orm.get_food_quantity_from_shopping_cart(1,1)).to eq(2)
-
-      Restaurant.orm.add_food_item(1,1,1)
-
-      expect(Restaurant.orm.get_food_quantity_from_shopping_cart(1,1)).to eq(3)
-    end
-  end
-
-  describe 'get_food_quantity_from_shopping_cart' do
-    it 'given the shopping cart id and food id, returns the food id and quantity' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
-
-      Restaurant.orm.create_food("hamburger", 10, "entree")
-
-      Restaurant.orm.add_food_item(1,1,2)
-
-      expect(Restaurant.orm.get_food_quantity_from_shopping_cart(1,1)).to eq(2)
+      # expect(Restaurant.orm.get_food_quantity_from_shopping_cart(1,1)).to eq(2)
     end
 
     xit 'returns false if no food matching the food is is in the shopping cart' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
+      # Restaurant.orm.create_customer("Benny")
+      # Restaurant.orm.add_shopping_cart(1)
 
-      expect(Restaurant.orm.get_food_quantity_from_shopping_cart(1,1)).to eq(0)
+      # expect(Restaurant.orm.get_food_quantity_from_shopping_cart(1,1)).to eq(0)
     end
   end
 
-  describe '#remove_food_item' do
-    xit 'removes a food item by id to a shopping cart with given id' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
+  describe '#read_shopping_cart_foods' do
+    it 'given a shopping cart id, retrieves all food ids and quantities of each food as an array' do
+      # Restaurant.orm.create_customer("Benny")
+      # Restaurant.orm.add_shopping_cart(1)
 
-      Restaurant.orm.create_food("hamburger", 10, "entree")
+      # Restaurant.orm.create_food("hamburger", 10, "entree")
+      # Restaurant.orm.add_food_item(1,1,2)
 
-      Restaurant.orm.add_food_item(1,1,2)
-
-      Restaurant.orm.remove_food_item(1,1)
-
-      expect(Restaurant.orm.get_food_quantity_from_shopping_cart(1,1)).to eq(0)
+      # expect(Restaurant.orm.list_items_in_shopping_cart(1).length).to eq(1)
+    end
+  end
+  describe '#update_shopping_cart_remove_food' do
+    xit 'adds food to an empty cart' do
+    end
+    xit 'increases the quantity of food in the shopping cart' do
     end
   end
 
-  describe '#list_items_in_shopping_cart' do
-    it 'retrieves all information from the shopping_cart, given the id, returns as an array of arrays with food entity information' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
 
-      Restaurant.orm.create_food("hamburger", 10, "entree")
-      Restaurant.orm.add_food_item(1,1,2)
-
-      expect(Restaurant.orm.list_items_in_shopping_cart(1).length).to eq(1)
-    end
-
-    it 'returns an empty array when a food item is removed from the shopping cart' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
-
-      Restaurant.orm.create_food("hamburger", 10, "entree")
-      Restaurant.orm.add_food_item(1,1,2)
-      Restaurant.orm.remove_food_item(1,1)
-
-      expect(Restaurant.orm.list_items_in_shopping_cart(1).length).to eq(0)
-    end
-  end
-
-  describe '#shopping_cart_item_prices' do
-    it 'retrieves the prices for all items in a shopping_cart and returns as an array of prices' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
-
-      Restaurant.orm.create_food("hamburger", 10, "entree")
-      Restaurant.orm.create_food("burrito", 8, "entree")
-
-      Restaurant.orm.add_food_item(1,1,2)
-      Restaurant.orm.add_food_item(1,2,1)
-
-      expect(Restaurant.orm.shopping_cart_item_prices(1).length).to eq(2)
-    end
-  end
-
-  describe '#decrease_quantity_of_item' do
+  describe '#update_shopping_cart_remove_food' do
     xit 'checks if the food item exists in the shopping cart' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
+      # Restaurant.orm.create_customer("Benny")
+      # Restaurant.orm.add_shopping_cart(1)
 
-      expect(Restaurant.orm.decrease_quantity_of_item(1,1,2)).to eq(false)
+      # expect(Restaurant.orm.decrease_quantity_of_item(1,1,2)).to eq(false)
     end
 
     xit 'updates the quantity of a food item in the shopping cart' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
+      # Restaurant.orm.create_customer("Benny")
+      # Restaurant.orm.add_shopping_cart(1)
 
-      Restaurant.orm.create_food("hamburger", 10, "entree")
+      # Restaurant.orm.create_food("hamburger", 10, "entree")
 
-      Restaurant.orm.add_food_item(1,1,4)
+      # Restaurant.orm.add_food_item(1,1,4)
 
-      Restaurant.orm.decrease_quantity_of_item(1,1,2)
-      expect(Restaurant.orm.list_items_in_shopping_cart(1)[0][4]).to eq(2)
+      # Restaurant.orm.decrease_quantity_of_item(1,1,2)
+      # expect(Restaurant.orm.list_items_in_shopping_cart(1)[0][4]).to eq(2)
     end
 
     xit 'does not allow the quantity of food items in a shopping cart to go negative' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
+      # Restaurant.orm.create_customer("Benny")
+      # Restaurant.orm.add_shopping_cart(1)
 
-      Restaurant.orm.create_food("hamburger", 10, "entree")
+      # Restaurant.orm.create_food("hamburger", 10, "entree")
 
-      Restaurant.orm.add_food_item(1,1,4)
+      # Restaurant.orm.add_food_item(1,1,4)
 
-      expect(Restaurant.orm.decrease_quantity_of_item(1,1,5)).to eq(false)
+      # expect(Restaurant.orm.decrease_quantity_of_item(1,1,5)).to eq(false)
     end
 
     xit 'removes an item from the shopping cart when the quantity is zero' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_shopping_cart(1)
+      # Restaurant.orm.create_customer("Benny")
+      # Restaurant.orm.add_shopping_cart(1)
 
-      Restaurant.orm.create_food("hamburger", 10, "entree")
+      # Restaurant.orm.create_food("hamburger", 10, "entree")
 
-      Restaurant.orm.add_food_item(1,1,4)
+      # Restaurant.orm.add_food_item(1,1,4)
 
-      Restaurant.orm.decrease_quantity_of_item(1,1,4)
+      # Restaurant.orm.decrease_quantity_of_item(1,1,4)
 
-      expect(Restaurant.orm.get_food_from_shopping_cart(1,1)).to eq(false)
+      # expect(Restaurant.orm.get_food_from_shopping_cart(1,1)).to eq(false)
     end
   end
 
