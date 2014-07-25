@@ -224,129 +224,68 @@ describe 'Orm' do
   end
 
 #### MENU CLASS ####
-  describe '#add_menu' do
-    it 'creates a menu given a name and returns an array of menu information' do
-      expect(Restaurant.orm.add_menu("lunch")).to be_a(Array)
+  describe '#create_menu' do
+    xit 'creates a menu given a name and returns the menu id' do
+      expect(Restaurant.orm.create_menu("lunch")[0].to_i).to eq(1)
     end
   end
 
-  describe '#get_menu' do
-    it 'looks up a menu tuple by id and returns an array with the menu information' do
-      Restaurant.orm.add_menu("lunch")
-      expect(Restaurant.orm.get_menu(1).length).to eq(2)
+  describe 'read_menus' do
+    xit 'lists all menus and menu information' do
+      Restaurant.orm.create_menu("lunch")
+      Restaurant.orm.create_menu("dinner")
+
+      expect(Restaurant.orm.read_menus).to be_a(Array)
+      expect(Restaurant.orm.read_menus[0][1]).to eq("lunch")
     end
   end
 
-  describe '#add_food_to_menu' do
-    it 'adds a food item to the menu given a menu_id and food_id' do
-      Restaurant.orm.add_menu("lunch")
+  describe '#add_menus_food' do
+    xit 'adds a food item to the menu given a menu_id and food_id and returns a boolean' do
+      Restaurant.orm.create_menu("lunch")
 
-      Restaurant.orm.create_food("hamburger", 10, "entree")
+      # Restaurant.orm.create_food("hamburger", 10, "entree")
 
-      expect(Restaurant.orm.add_food_to_menu(1,1)).to be_a(Array)
+      # expect(Restaurant.orm.add_food_to_menu(1,1)).to be_a(Array)
+    end
+  end
+
+  describe '#read_menu_foods' do
+    xit 'returns all food listed on a menu given a menu id' do
+      Restaurant.orm.create_menu("lunch")
+      ##COMPLETE
+
     end
   end
 
 #### ORDER CLASS ####
-  describe '#add_order' do
-    it 'creates a new order and returns an array with order information' do
-      Restaurant.orm.create_customer("Benny")
-      expect(Restaurant.orm.add_order(1)).to be_a(Array)
-    end
-  end
 
-  describe '#get_order' do
-    it 'retrieves an order, given an id, and returns an array with order information' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_order(1)
-
-      expect(Restaurant.orm.get_order(1)).to be_a(Array)
-      expect(Restaurant.orm.get_order(1).length).to eq(4)
-    end
-  end
 
   describe '#list_orders' do
     it 'lists all orders and returns an array of arrays with order information' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.create_customer("Caitlin")
 
-      Restaurant.orm.add_order(1)
-      Restaurant.orm.add_order(2)
-
-      expect(Restaurant.orm.list_orders.length).to eq(2)
     end
   end
 
-  describe '#submit_order' do
-    xit 'submits all food items and quantities from the shopping_cart to the order' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.create_food("hamburger", 10, "entree")
-      Restaurant.orm.add_shopping_cart(1)
-      Restaurant.orm.add_food_item(1,1,4)
-
-      Restaurant.orm.add_order(1)
-
-      Restaurant.orm.submit_order(1,1)
-
-      expect(Restaurant.orm.list_items_in_order[0][0]).to eq(1)
-    end
-  end
-
-  describe '#list_items_in_order' do
-    xit 'returns an array of arrays with food information for a specific order given an order id' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_order(1)
+  describe '#read_orders_by_status' do
+    xit 'returns an array of orders by id and status' do
 
     end
   end
 
   describe '#mark_complete' do
-    it 'updates the status of an order to closed given an order id' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_order(1)
+    xit 'marks an order complete by id' do
 
-      expect(Restaurant.orm.mark_complete(1)).to eq(true)
     end
   end
 
-  describe '#list_open_orders' do
-    it 'lists all orders with an open status and returns an array of arrays with order information' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.create_customer("Caitlin")
 
-      Restaurant.orm.add_order(1)
-      Restaurant.orm.add_order(2)
-
-      Restaurant.orm.mark_complete(1)
-
-      expect(Restaurant.orm.list_open_orders.length).to eq(1)
-    end
-  end
-
-  describe '#list_closed_orders' do
-    it 'lists all orders with a closed status and returns an array of arrays with order information' do
-      Restaurant.orm.create_customer("Benny")
-      Restaurant.orm.add_order(1)
-
-      Restaurant.orm.mark_complete(1)
-
-      expect(Restaurant.orm.list_closed_orders.length).to eq(1)
-    end
-  end
 
 
 #### STAFF CLASS ####
   describe '#create_staff' do
-    it 'creates a staff member given a name and returns an array of staff information' do
-      expect(Restaurant.orm.create_staff("Sara")).to be_a(Array)
-    end
-  end
-
-  describe '#get_staff' do
-    it 'looks up a staff tuple by id and returns an array with the staff information' do
-      Restaurant.orm.create_staff("Sara")
-      expect(Restaurant.orm.get_staff(1)).to be_a(Array)
-      expect(Restaurant.orm.get_staff(1).length).to eq(2)
+    it 'creates a staff member given a name and returns a staff id' do
+      expect(Restaurant.orm.create_staff("Sara")[0].to_i).to eq(1)
     end
   end
 

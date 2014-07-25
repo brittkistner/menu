@@ -1,22 +1,18 @@
-
-
-
 <!doctype html>
 <html class="no-js" lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Staff Login Page</title>
-    <link rel="stylesheet" href="css/foundation.css"/>
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/normalize.css"/>
-    <link rel="stylesheet" href="fonts/foundation-icons.css"/>
+    <title><%= @title %></title>
+    <link rel="stylesheet" href="./css/foundation.css"/>
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/normalize.css"/>
+    <link rel="stylesheet" href="css/foundation-icons.css"/>
 
-    <script src="js/vendor/modernizr.js"></script>
+    <script src="./js/vendor/modernizr.js"></script>
   </head>
   <body>
-
-    <!-- TOP BAR -->
+        <!-- TOP BAR -->
     <div class="contain-to-grid">
       <nav class="top-bar" data-topbar>
         <ul class="title-area">
@@ -31,20 +27,16 @@
         </ul>
         <section class = "top-bar-section">
           <ul class="right">
-            <li><a href="login-customer.html">Login</a></li>
+            <li><a href="login-customer.erb">Login</a></li>
             <li><a href="#">Account</a></li>
-            <li><a href="customer-menu.html">Menu</a></li>
+            <li><a href="customer-menu.erb">Menu</a></li>
           </ul>
         </section>
       </nav>
     </div>
     <!-- END TOP BAR -->
-    <div class="large-12 column">
-      <h1>Landing Page</h1>
-      <a class="button" href="login-customer.erb">Login</a>
-      <a class="button" href="#">Join</a>
-      <a class="button" href="login-staff.erb">Staff Login Here</a>
-    </div>
+
+    <%= yield %>
 
     <!-- Footer -->
     <div class="row">
@@ -55,13 +47,14 @@
     </div>
     <!-- Footer End -->
 
-    <script src="js/vendor/jquery.js"></script>
-    <script src="js/foundation.min.js"></script>
+    <!-- Javascript -->
+    <script src="./js/vendor/jquery.js"></script>
+    <script src="./js/foundation.min.js"></script>
     <script>
       $(document).foundation();
     </script>
+    <!-- End Javascript -->
   </body>
 </html>
-
 
 
