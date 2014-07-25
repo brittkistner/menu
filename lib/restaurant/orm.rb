@@ -72,7 +72,7 @@ module Restaurant
         DROP TABLE IF EXISTS shopping_carts CASCADE;
         DROP TABLE IF EXISTS shopping_cart_foods CASCADE;
         DROP TABLE IF EXISTS menus CASCADE;
-        DROP TABLE IF EXISTS menus_food CASCADE;
+        DROP TABLE IF EXISTS menus_foods CASCADE;
         DROP TABLE IF EXISTS staff CASCADE;
       SQL
 
@@ -125,10 +125,24 @@ module Restaurant
 
     def read_foods
       command = <<-SQL
-      SELECT * FROM foods;
+      SELECT id, name, price, type_of_item
+      FROM foods;
       SQL
 
-      row = @db_adaptor.exec(command).values #returns nested array
+      table = @db_adaptor.exec(command).values
+
+      if table.empty?
+        return nil
+      else
+        list = []
+
+        table.each do |x|
+          list << {id: Integer(x[0]), name: x[1], price: Integer(x[2]), type_of_item: x[3]}
+        end
+      end
+
+      list
+
     end
 
   # ###############
@@ -284,15 +298,24 @@ module Restaurant
 
     def read_menus
       command = <<-SQL
-      SELECT * FROM menus;
+      SELECT id, name
+      FROM menus;
       SQL
 
-      row = @db_adaptor.exec(command).values
+      table = @db_adaptor.exec(command).values
+
+      result = []
+
+      table.each do |x|
+        result << {id: Integer(x[0]), name: x[1]}
+      end
+
+      result
     end
 
-    def add_menus_food(menu_id, food_id)
+    def add_menus_foods(menu_id, food_id)
       command = <<-SQL
-      INSERT INTO menus_food (menu_id, food_id)
+      INSERT INTO menus_foods (menu_id, food_id)
       VALUES ('#{menu_id}', '#{food_id}');
       SQL
       @db_adaptor.exec(command)
@@ -303,11 +326,19 @@ module Restaurant
     def read_menu_foods(menu_id)
       command = <<-SQL
       SELECT food_id
-      FROM menus_food
+      FROM menus_foods
       WHERE menu_id = '#{menu_id}';
       SQL
 
-      row = @db_adaptor.exec(command).values #[['food1'],['food2']]
+      table = @db_adaptor.exec(command).values #[['food1'],['food2']]
+
+      result = []
+
+      table.each do |x|
+        result << {id: Integer(x[0])}
+      end
+
+      result
     end
 
     # ############

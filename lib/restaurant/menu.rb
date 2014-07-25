@@ -1,49 +1,41 @@
 class Restaurant::Menu
 
   attr_reader :id, :name
-  attr_accessor :menu_list
 
   def initialize(id, name)
-    @id = Integer(id)
+    @id = id
     @name = name
-    @menu_list = []
-  end
-
-  def self.get(id)
-    result = Restaurant.orm.get_menu(id)
-    Restaurant::Menu.new(result[0],result[1])
   end
 
   def self.create_menu(name)
-    result = Restaurant.orm.add_menu(name)
-    menu = Restaurant::Menu.new(result[0],result[1])
-    menu
+    result = Restaurant.orm.create_menu(name)
+    Restaurant::Menu.new(result[:id], name)
   end
 
-  def add_food_to_menu(fid)
-    result = Restaurant.orm.add_food_to_menu(@id,fid)
+  def self.get_all
+    result = Restaurant.orm.read_menus
 
-    food = Restaurant::Food.new(result[0],result[1],result[2],result[3])
-
-    menu_list << food
-  end
-
-  def get_beverages
-    menu_list.delete_if do |x|
-      x.type_of_item != "beverage"
+    list = []
+    result.each do |x|
+      list << Restaurant::Menu.new(x[:id], x[:name])
     end
+
+    list
   end
 
-  def get_appetizers
-    menu_list.delete_if do |x|
-      x.type_of_item != "appetizer"
+  def add_food_to_menu(food_id)
+    result = Restaurant.orm.add_menus_foods(@id,food_id) #returns boolean
+  end
+
+  def get_food_from_menu
+    result = Restaurant.orm.read_menu_foods(@id)
+
+    list = []
+
+    result.each do |x|
+      list << x[:id]
     end
-  end
 
-  def get_entrees
-    menu_list.delete_if do |x|
-      x.type_of_item != "entree"
-    end
+    list #return an array of food ids
   end
-
 end

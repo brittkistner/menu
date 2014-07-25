@@ -21,19 +21,23 @@ class Restaurant::Food
 
   def self.get_all
     result = Restaurant.orm.read_foods
-    list = []
 
-    result.each do |item|
-      list << Restaurant::Food.new(result[:id],result[:name],result[:price],result[:type_of_item])
+    if result.nil?
+      return nil
+    else
+      list = []
+
+      result.each do |food|
+        list << Restaurant::Food.new(food[:id],food[:name],food[:price],food[:type_of_item])
+      end
+
+      list
     end
-
-    list
   end
 
   def self.delete_food(id)
     Restaurant.orm.delete_food(id) #returns true
   end
-
 
 end
 

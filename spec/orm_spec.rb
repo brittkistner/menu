@@ -40,7 +40,7 @@ describe 'Orm' do
   end
 
   describe '#read_foods' do
-    xit 'retrieves all information from the food table and returns as an array of arrays' do
+    it 'retrieves all information from the food table and returns as an array of arrays' do
       Restaurant.orm.create_food("hamburger", 10, "entree")
       Restaurant.orm.create_food("burrito", 8, "entree")
       expect(Restaurant.orm.read_foods.length).to eq(2)
@@ -160,36 +160,36 @@ describe 'Orm' do
 
 #### MENU CLASS ####
   describe '#create_menu' do
-    xit 'creates a menu given a name and returns the menu id' do
-      expect(Restaurant.orm.create_menu("lunch")[0].to_i).to eq(1)
+    it 'creates a menu given a name and returns the menu id' do
+      expect(Restaurant.orm.create_menu("lunch")[:id]).to eq(1)
     end
   end
 
   describe 'read_menus' do
-    xit 'lists all menus and menu information' do
+    it 'lists menu id and name for each menu' do
       Restaurant.orm.create_menu("lunch")
       Restaurant.orm.create_menu("dinner")
 
-      expect(Restaurant.orm.read_menus).to be_a(Array)
-      expect(Restaurant.orm.read_menus[0][1]).to eq("lunch")
+      expect(Restaurant.orm.read_menus[1][:name]).to eq("dinner")
     end
   end
 
   describe '#add_menus_food' do
-    xit 'adds a food item to the menu given a menu_id and food_id and returns a boolean' do
+    it 'adds a food item to the menu given a menu_id and food_id' do
       Restaurant.orm.create_menu("lunch")
-
-      # Restaurant.orm.create_food("hamburger", 10, "entree")
-
-      # expect(Restaurant.orm.add_food_to_menu(1,1)).to be_a(Array)
+      Restaurant.orm.create_food("hamburger", 10, "entree")
+      Restaurant.orm.add_menus_foods(1,1)
+      expect(Restaurant.orm.read_menu_foods(1)[0][:id]).to eq(1)
     end
   end
 
   describe '#read_menu_foods' do
-    xit 'returns all food listed on a menu given a menu id' do
+    it 'returns all food listed on a menu given a menu id' do
       Restaurant.orm.create_menu("lunch")
-      ##COMPLETE
+      Restaurant.orm.create_food("hamburger", 10, "entree")
+      Restaurant.orm.add_menus_foods(1,1)
 
+      expect(Restaurant.orm.read_menu_foods(1)[0][:id]).to eq(1)
     end
   end
 

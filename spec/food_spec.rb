@@ -20,19 +20,20 @@ describe 'Restaurant::Food' do
   end
 
   describe '.delete_food' do
-    xit 'deletes a food item from the food list given a food id' do
+    it 'deletes a food item from the food list given a food id' do
       Restaurant::Food.create("Coke", 2, "beverage")
       Restaurant::Food.delete_food(1)
-      expect(Restaurant::Food.get(1)).to be_nil
+      expect(Restaurant::Food.get_all).to be_nil
     end
   end
 
   describe '.get_all' do
-    xit 'retrieves all food on the food list' do
+    it 'retrieves all food on the food list' do
       Restaurant::Food.create("Coke", 2, "beverage")
       Restaurant::Food.create("Pepsi", 5, "beverage")
 
       expect(Restaurant::Food.get_all.length).to eq(2)
+      expect(Restaurant::Food.get_all[0].name).to eq("Coke")
     end
   end
 end
