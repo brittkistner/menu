@@ -7,65 +7,53 @@ class Restaurant::Order
   attr_accessor :status
 
   def initialize(id, customer_id, creation_time, status)
-    @id = Integer(id)
-    @customer_id = Integer(customer_id)
+    @id = id
+    @customer_id = customer_id
     @creation_time = DateTime.parse(creation_time)
     @status = status
   end
 
-  def self.get(id)
-    result = Restaurant.orm.get_order(id)
-    Restaurant::Order.new(result[0], result[1], result[2], result[3])
-  end
-
-  def self.create_order(customer_id)
-    result = Restaurant.orm.add_order(customer_id)
-    order = Restaurant::Order.new(result[0],result[1],result[2], result[3])
+  def self.create_order_delete_shopping_cart(shopping_cart_id)
+    result = Restaurant.orm.create_order_delete_shopping_cart(shopping_cart_id)
+    order = Restaurant::Order.new(result[:id],result[:customer_id],result[:creation_time], result[:status])
     order
   end
 
-  def self.list_orders
-    result = Restaurant.orm.list_orders
-    orders = []
+  def self.get_orders_by_status
+    result = Restaurant.orm.read_orders_by_status
 
-    result.each do |order|
-      orders << Restaurant::Order.new(order[0],order[1],order[2], order[3])
+    list = []
+    if result.nil?
+      return nil
+    else
+      result.each do |x|
+        list << [x[:order_id], x[:status]]
+      end
     end
 
-    orders
+    list
   end
 
-  def list_items_in_order
-    result = Restaurant.orm.list_items_in_order(@id)
-    items = []
-    result.each do |item|
-      items << Restaurant::Food.new(item[0],item[1],item[2],item[3],item[4])
+  def update_order_status(status)
+    if status != "open" || "closed"
+      return nil
+    else
+      Restaurant.orm.update_order_status(@id,status) #returns boolean
+    end
+  end
+
+  def read_order_foods
+    result = Restaurant.orm.read_order_foods(@id)
+
+    list = []
+    if result.nil?
+      return nil
+    else
+      result.each do |x|
+        list << [x[:food_id], x[:food_quantity]]
+      end
     end
 
-    items
-  end
-
-  def self.list_open_orders
-    result = Restaurant.orm.list_open_orders
-    open_orders = []
-
-    result.each do |open_order|
-      open_orders << Restaurant::Order.new(open_order[0],open_order[1],open_order[2],open_order[3])
-    end
-    open_orders
-  end
-
-  def self.list_closed_orders
-    result = Restaurant.orm.list_closed_orders
-    closed_orders = []
-
-    result.each do |order|
-      closed_orders << Restaurant::Order.new(order[0],order[1],order[2],order[3])
-    end
-    closed_orders
-  end
-
-  def self.complete_order(id)
-    Restaurant.orm.mark_complete(id)
+    list
   end
 end

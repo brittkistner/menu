@@ -34,8 +34,9 @@ describe 'Orm' do
 
   describe '#delete_food' do
     it 'removes a tuple from the food table and returns true' do
-      Restaurant.orm.create_food("hamburger", 10, "entree")
-      expect(Restaurant.orm.delete_food(1)).to be_true
+      food_id = Restaurant.orm.create_food("hamburger", 10, "entree")
+      expect(Restaurant.orm.delete_food(food_id)).to be_true
+      expect(Restaurant.orm.read_food_by_id(food_id)).to be_nil
     end
   end
 
@@ -155,6 +156,21 @@ describe 'Orm' do
 
       Restaurant.orm.update_shopping_cart_remove_food(1,1,2)
       expect(Restaurant.orm.read_shopping_cart_food_quantity(1,1)).to eq(0)
+    end
+
+    describe '#read_shopping_cart_foods' do
+      it 'returns an array of food id and quantity for a shopping cart' do
+        Restaurant.orm.create_customer("Benny")
+        Restaurant.orm.update_customer_add_shopping_cart(1)
+
+        Restaurant.orm.create_food("hamburger", 10, "entree")
+        Restaurant.orm.create_food("burrito", 8, "entree")
+
+        Restaurant.orm.update_shopping_cart_add_food(1,1,2)
+        Restaurant.orm.update_shopping_cart_add_food(1,2,10)
+
+        expect(Restaurant.orm.read_shopping_cart_foods(1).length).to eq(2)
+      end
     end
   end
 

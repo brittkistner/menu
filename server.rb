@@ -1,7 +1,7 @@
 require 'sinatra'
 # require 'lib/restaurant.rb'
 
-get '/index' do
+get '/' do
   @title = "Restaurant"
   erb :index
 end

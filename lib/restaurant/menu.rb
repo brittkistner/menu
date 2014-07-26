@@ -14,10 +14,14 @@ class Restaurant::Menu
 
   def self.get_all
     result = Restaurant.orm.read_menus
-
     list = []
-    result.each do |x|
-      list << Restaurant::Menu.new(x[:id], x[:name])
+
+    if result.nil?
+      return nil
+    else
+      result.each do |x|
+        list << Restaurant::Menu.new(x[:id], x[:name])
+      end
     end
 
     list
@@ -31,9 +35,12 @@ class Restaurant::Menu
     result = Restaurant.orm.read_menu_foods(@id)
 
     list = []
-
-    result.each do |x|
-      list << x[:id]
+    if result.nil?
+      return nil
+    else
+      result.each do |x|
+        list << x[:id]
+      end
     end
 
     list #return an array of food ids

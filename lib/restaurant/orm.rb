@@ -106,9 +106,14 @@ module Restaurant
       WHERE id = '#{id}';
       SQL
 
-      row = @db_adaptor.exec(command).values[0]
+      table = @db_adaptor.exec(command).values
 
-      {id: Integer(row[0]), name: row[1], price: Integer(row[2]), type_of_item: row[3]}
+      if table.empty?
+        return nil
+      else
+        row = table[0]
+        {id: Integer(row[0]), name: row[1], price: Integer(row[2]), type_of_item: row[3]}
+      end
     end
 
     def delete_food(id)
@@ -283,11 +288,23 @@ module Restaurant
     def read_shopping_cart_foods(id)
       command = <<-SQL
       SELECT food_id, food_quantity
-      FROM shopping_cart_food
+      FROM shopping_cart_foods
       WHERE SCID = '#{id}';
       SQL
 
-      row = @db_adaptor.exec(command).values #[[food_id1, quantity1],[food_id2, quantity2]]
+      table = @db_adaptor.exec(command).values #[[food_id1, quantity1],[food_id2, quantity2]]
+
+      if table.empty?
+        return nil
+      else
+        list = []
+
+        table.each do |x|
+          list << {food_id: Integer(x[0]), food_quantity: Integer(x[1])}
+        end
+      end
+
+      list
     end
 
     # ###########
@@ -364,37 +381,50 @@ module Restaurant
       #   RETURNING *;
       #   SQL
 
+# INSERT INTO order_food
+# SELECT #{order_id}, food_id
+# FROM shopping_cart_food
+# WHERE shopping_cart_id = #{shopping_cart_id}
+
 
     def create_order_delete_shopping_cart(shopping_cart_id)
-      read_shopping_cart_food_by_items_and_quantity = <<-SQL
-      SELECT food_id, food_quantity
+      creation_time = Time.now
+
+      create_order = <<-SQL
+      INSERT INTO orders (customer_id, creation_time, status)
+      SELECT customer_id, '#{creation_time}', 'open'
+      FROM shopping_carts
+      WHERE id = '#{shopping_cart_id}'
+      RETURNING id;
+      SQL
+
+      order_id = @db_adaptor.exec(create_order).values[0].to_i
+
+      create_orders_foods = <<-SQL
+      INSERT INTO orders_foods
+      SELECT '#{order_id}', food_id, food_quantity
       FROM shopping_cart_food
       WHERE SCID = '#{shopping_cart_id}';
       SQL
 
+      @db.db_adaptor.exec(create_orders_foods)
 
-      create_orders_food = <<-SQL
-      INSERT INTO orders_foods(item_id, item_quantity, )
-      Values ('#{food_id}', '#{food_quantity}')
-      RETURNING order_id;
-      SQL
-
-      delete_shopping_cart = <<-SQL
+      delete_shopping_cart_foods = <<-SQL
       DELETE
-      FROM shopping_cart_food
+      FROM shopping_cart_foods
       WHERE SCID = '#{shopping_cart_id}';
       SQL
 
-      array = @db_adaptor.exec(read_shopping_cart_food_by_items_and_quantity).values
+      delete_shopping_carts= <<-SQL
+      DELETE
+      FROM shopping_carts
+      WHERE id = '#{shopping_cart_id}';
+      SQL
 
-      @db_adaptor.exec(delete_shopping_cart)
+      @db_adaptor.exec(delete_shopping_cart_foods)
+      @db_adaptor.exec(delete_shopping_carts)
 
-      array.each do |x|
-        item_id = x[0]
-        item_quantity = x[1]
-        ##THIS WILL CREATE MULTIPLE ORDERS, DO IT A DIFFERENT WAY (ADD ORDER, change tables)
-        @db_adaptor.exec(create_orders_food)
-      end
+      order_id
     end
 
     def read_orders_by_status
@@ -403,10 +433,17 @@ module Restaurant
       FROM orders;
       SQL
 
-      row = @db_adaptor.exec(command).values #array(dict) (order_id, status)
+      table = @db_adaptor.exec(command).values (order_id, status)
+      result = []
+
+      table.each do |x|
+        result << {order_id: Integer(x[0]), status: x[1]}
+      end
+
+      result
     end
 
-    def mark_complete(id,status)
+    def update_order_status(id,status)
       command = <<-SQL
       UPDATE orders
       SET status = '#{status}'
@@ -418,15 +455,21 @@ module Restaurant
       true
     end
 
-    def read_orders_foods(id)
+    def read_order_foods(id) #(food_id, quantity)
       command = <<-SQL
       SELECT food_id, food_quantity
       FROM orders_foods
       WHERE order_id = '#{id}';
       SQL
 
-      row = @db_adaptor.exec(command).values #nested arrays
+      table = @db_adaptor.exec(command).values
+      result = []
 
+      table.each do |x|
+        result << {food_id: Integer(x[0]), food_quantity: Integer(x[1])}
+      end
+
+      result
     end
 
     ############
