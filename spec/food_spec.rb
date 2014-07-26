@@ -14,15 +14,15 @@ describe 'Restaurant::Food' do
 
   describe '.get' do
     it 'takes a food id and returns a food instance' do
-      Restaurant::Food.create("Coke", 2, "beverage")
-      expect(Restaurant::Food.get(1)).to be_a(Restaurant::Food)
+      food_instance = Restaurant::Food.create("Coke", 2, "beverage")
+      expect(Restaurant::Food.get(food_instance.id)).to be_a(Restaurant::Food)
     end
   end
 
   describe '.delete_food' do
     it 'deletes a food item from the food list given a food id' do
-      Restaurant::Food.create("Coke", 2, "beverage")
-      Restaurant::Food.delete_food(1)
+      food_instance = Restaurant::Food.create("Coke", 2, "beverage")
+      Restaurant::Food.delete_food(food_instance.id)
       expect(Restaurant::Food.get_all).to be_nil
     end
   end

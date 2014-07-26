@@ -1,6 +1,3 @@
-require 'date'
-require 'time'
-
 class Restaurant::Order
 
   attr_reader :id, :table_number, :creation_time
@@ -9,7 +6,7 @@ class Restaurant::Order
   def initialize(id, customer_id, creation_time, status)
     @id = id
     @customer_id = customer_id
-    @creation_time = DateTime.parse(creation_time)
+    @creation_time = creation_time
     @status = status
   end
 
@@ -34,13 +31,13 @@ class Restaurant::Order
     list
   end
 
-  def update_order_status(status)
-    if status != "open" || "closed"
-      return nil
-    else
-      Restaurant.orm.update_order_status(@id,status) #returns boolean
-    end
-  end
+  # def update_order_status(status)
+  #   if status != "open" || "closed"
+  #     return nil
+  #   else
+  #     Restaurant.orm.update_order_status(@id,status) #returns boolean
+  #   end
+  # end
 
   def read_order_foods
     result = Restaurant.orm.read_order_foods(@id)

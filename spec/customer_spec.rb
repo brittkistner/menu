@@ -15,8 +15,8 @@ it 'exists' do
 
   describe '.get' do
     it 'returns a customer instance given an id' do
-      Restaurant::Customer.create_customer("Crissy")
-      expect(Restaurant::Customer.get(1)).to be_a(Restaurant::Customer)
+      customer_id = Restaurant::Customer.create_customer("Crissy").id
+      expect(Restaurant::Customer.get(customer_id)).to be_a(Restaurant::Customer)
     end
   end
 

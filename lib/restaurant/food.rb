@@ -11,12 +11,12 @@ class Restaurant::Food
 
   def self.create(name, price, type_of_item)
     result = Restaurant.orm.create_food(name,price,type_of_item)
-    Restaurant::Food.new(result[:id],result[:name],result[:price],result[:type_of_item])
+    Restaurant::Food.new(result[:id],name, price, type_of_item)
   end
 
   def self.get(id)
     result = Restaurant.orm.read_food_by_id(id)
-    result == nil ? nil : Restaurant::Food.new(result[:id],result[:name],result[:price],result[:type_of_item])
+    result == nil ? nil : Restaurant::Food.new(id,result[:name],result[:price],result[:type_of_item])
   end
 
   def self.get_all

@@ -1,5 +1,7 @@
 require 'pg'
 require 'pry-byebug'
+require 'time'
+
 
 module Restaurant
   class Orm
@@ -91,17 +93,22 @@ module Restaurant
       command = <<-SQL
       INSERT INTO foods (name, price, type_of_item)
       VALUES ('#{name}', '#{price}','#{type_of_item}')
-      RETURNING id, name, price, type_of_item;
+      RETURNING id;
       SQL
 
-      row = @db_adaptor.exec(command).values[0]
+      table = @db_adaptor.exec(command).values
 
-      {id: Integer(row[0]), name: row[1], price: Integer(row[2]), type_of_item: row[3]}
+      if table.empty?
+        return nil
+      else
+        row = table[0]
+        {id: Integer(row[0])}
+      end
     end
 
     def read_food_by_id(id)
       command = <<-SQL
-      SELECT id, name, price, type_of_item
+      SELECT name, price, type_of_item
       FROM foods
       WHERE id = '#{id}';
       SQL
@@ -112,7 +119,7 @@ module Restaurant
         return nil
       else
         row = table[0]
-        {id: Integer(row[0]), name: row[1], price: Integer(row[2]), type_of_item: row[3]}
+        {name: row[0], price: Integer(row[1]), type_of_item: row[2]}
       end
     end
 
@@ -161,9 +168,14 @@ module Restaurant
       RETURNING id;
       SQL
 
-      row = @db_adaptor.exec(command).values[0]
+      table = @db_adaptor.exec(command).values
+      if table.empty?
+        return nil
+      else
+        row = table[0]
+        {id: Integer(row[0])}
+      end
 
-      {id: Integer(row[0])}
     end
 
     def read_customer(id)
@@ -173,9 +185,14 @@ module Restaurant
       WHERE id = '#{id}';
       SQL
 
-      row = @db_adaptor.exec(command).values[0]
+      table = @db_adaptor.exec(command).values
 
-      {name: row[0]}
+      if table.empty?
+        return nil
+      else
+        row = table[0]
+        {name: row[0]}
+      end
     end
 
     def update_customer_add_shopping_cart(id)
@@ -185,9 +202,14 @@ module Restaurant
       RETURNING id;
       SQL
 
-      row = @db_adaptor.exec(command).values[0]
+      table = @db_adaptor.exec(command).values
 
-      {id: Integer(row[0])}
+      if table.empty?
+        return nil
+      else
+        row = table[0]
+        {id: Integer(row[0])}
+      end
     end
 
     def read_customer_shopping_carts(id)
@@ -222,10 +244,12 @@ module Restaurant
       WHERE food_id = '#{food_id}' AND SCID = '#{shopping_cart_id}';
       SQL
 
-      if @db_adaptor.exec(check_for_food).values.empty?
-        0
+      table = @db_adaptor.exec(check_for_food).values
+
+      if table.empty?
+        return 0
       else
-        row = @db_adaptor.exec(check_for_food).values[0]
+        row = table[0]
         {food_quantity: Integer(row[0])}
       end
     end
@@ -318,9 +342,14 @@ module Restaurant
       RETURNING id;
       SQL
 
-      row = @db_adaptor.exec(command).values[0] #returns ['id']
+      table = @db_adaptor.exec(command).values
 
-      {id: Integer(row[0])}
+      if table.empty?
+        return nil
+      else
+        row = table[0]
+        {id: Integer(row[0])}
+      end
     end
 
     def read_menus
@@ -331,13 +360,18 @@ module Restaurant
 
       table = @db_adaptor.exec(command).values
 
-      result = []
+      if table.empty?
+        return nil
+      else
+        result = []
 
-      table.each do |x|
-        result << {id: Integer(x[0]), name: x[1]}
+        table.each do |x|
+          result << {id: Integer(x[0]), name: x[1]}
+        end
+
+        result
       end
 
-      result
     end
 
     def add_menus_foods(menu_id, food_id)
@@ -358,119 +392,126 @@ module Restaurant
       SQL
 
       table = @db_adaptor.exec(command).values #[['food1'],['food2']]
+      if table.empty?
+        return nil
+      else
+        result = []
 
-      result = []
+        table.each do |x|
+          result << {id: Integer(x[0])}
+        end
 
-      table.each do |x|
-        result << {id: Integer(x[0])}
+        result
       end
-
-      result
     end
 
     # ############
     # #Order Class
     # ############
 
-      # def add_order(customer_id)
-      #   status = "open"
-      #   creation_time = Time.now
-      #   command = <<-SQL
-      #   INSERT INTO Orders (customer_id, creation_time, status)
-      #   VALUES ('#{customer_id}', '#{creation_time}', '#{status}')
-      #   RETURNING *;
-      #   SQL
+    # def create_order_delete_shopping_cart(shopping_cart_id)
+    #   creation_time = Time.now
 
-# INSERT INTO order_food
-# SELECT #{order_id}, food_id
-# FROM shopping_cart_food
-# WHERE shopping_cart_id = #{shopping_cart_id}
+    #   create_order = <<-SQL
+    #   INSERT INTO orders (customer_id, creation_time, status)
+    #   SELECT customer_id, '#{creation_time}', 'open'
+    #   FROM shopping_carts
+    #   WHERE id = '#{shopping_cart_id}'
+    #   RETURNING id;
+    #   SQL
 
+    #   order_id = @db_adaptor.exec(create_order).values[0][0].to_i
 
-    def create_order_delete_shopping_cart(shopping_cart_id)
-      creation_time = Time.now
+    #   create_orders_foods = <<-SQL
+    #   INSERT INTO orders_foods
+    #   SELECT '#{order_id}', food_id, food_quantity
+    #   FROM shopping_cart_foods
+    #   WHERE SCID = '#{shopping_cart_id}';
+    #   SQL
 
-      create_order = <<-SQL
-      INSERT INTO orders (customer_id, creation_time, status)
-      SELECT customer_id, '#{creation_time}', 'open'
-      FROM shopping_carts
-      WHERE id = '#{shopping_cart_id}'
-      RETURNING id;
-      SQL
+    #   @db_adaptor.exec(create_orders_foods)
 
-      order_id = @db_adaptor.exec(create_order).values[0].to_i
+    #   delete_shopping_cart_foods = <<-SQL
+    #   DELETE
+    #   FROM shopping_cart_foods
+    #   WHERE SCID = '#{shopping_cart_id}';
+    #   SQL
 
-      create_orders_foods = <<-SQL
-      INSERT INTO orders_foods
-      SELECT '#{order_id}', food_id, food_quantity
-      FROM shopping_cart_food
-      WHERE SCID = '#{shopping_cart_id}';
-      SQL
+    #   delete_shopping_carts= <<-SQL
+    #   DELETE
+    #   FROM shopping_carts
+    #   WHERE id = '#{shopping_cart_id}';
+    #   SQL
 
-      @db.db_adaptor.exec(create_orders_foods)
+    #   @db_adaptor.exec(delete_shopping_cart_foods)
+    #   @db_adaptor.exec(delete_shopping_carts)
 
-      delete_shopping_cart_foods = <<-SQL
-      DELETE
-      FROM shopping_cart_foods
-      WHERE SCID = '#{shopping_cart_id}';
-      SQL
+    #   read_order= <<-SQL
+    #   SELECT customer_id, creation_time
+    #   FROM orders
+    #   WHERE id = '#{order_id}';
+    #   SQL
 
-      delete_shopping_carts= <<-SQL
-      DELETE
-      FROM shopping_carts
-      WHERE id = '#{shopping_cart_id}';
-      SQL
+    #   row = @db_adaptor.exec(read_order).values[0]
 
-      @db_adaptor.exec(delete_shopping_cart_foods)
-      @db_adaptor.exec(delete_shopping_carts)
+    #   {id: order_id, customer_id: Integer(row[0]), creation_time: DateTime.parse(row[1]), status: "open" }
 
-      order_id
-    end
+    #   # order_id
+    # end
 
-    def read_orders_by_status
-      command = <<-SQL
-      SELECT id,status
-      FROM orders;
-      SQL
+    # def read_orders_by_status
+    #   command = <<-SQL
+    #   SELECT id,status
+    #   FROM orders;
+    #   SQL
 
-      table = @db_adaptor.exec(command).values (order_id, status)
-      result = []
+    #   table = @db_adaptor.exec(command).values
 
-      table.each do |x|
-        result << {order_id: Integer(x[0]), status: x[1]}
-      end
+    #   if table.empty?
+    #     return nil
+    #   else
+    #     result = []
 
-      result
-    end
+    #     table.each do |x|
+    #       result << {order_id: Integer(x[0]), status: x[1]}
+    #     end
 
-    def update_order_status(id,status)
-      command = <<-SQL
-      UPDATE orders
-      SET status = '#{status}'
-      WHERE id = '#{id}';
-      SQL
+    #     result
+    #   end
+    # end
 
-      @db_adaptor.exec(command)
+    # def update_order_status(id,status)
+    #   command = <<-SQL
+    #   UPDATE orders
+    #   SET status = '#{status}'
+    #   WHERE id = '#{id}';
+    #   SQL
 
-      true
-    end
+    #   @db_adaptor.exec(command)
 
-    def read_order_foods(id) #(food_id, quantity)
-      command = <<-SQL
-      SELECT food_id, food_quantity
-      FROM orders_foods
-      WHERE order_id = '#{id}';
-      SQL
+    #   true
+    # end
 
-      table = @db_adaptor.exec(command).values
-      result = []
+    # def read_order_foods(id) #(food_id, quantity)
+    #   command = <<-SQL
+    #   SELECT food_id, food_quantity
+    #   FROM orders_foods
+    #   WHERE order_id = '#{id}';
+    #   SQL
 
-      table.each do |x|
-        result << {food_id: Integer(x[0]), food_quantity: Integer(x[1])}
-      end
+    #   table = @db_adaptor.exec(command).values
+    #   if table.empty?
+    #     return nil
+    #   else
+    #     result = []
 
-      result
-    end
+    #     table.each do |x|
+    #       result << {food_id: Integer(x[0]), food_quantity: Integer(x[1])}
+    #     end
+
+    #     result
+    #   end
+    # end
 
     ############
     #Staff Class
@@ -482,9 +523,14 @@ module Restaurant
       RETURNING id;
       SQL
 
-      row = @db_adaptor.exec(command).values[0] #['id']
+      table = @db_adaptor.exec(command).values
 
-      hash = {id: Integer(row[0])}
+      if table.empty?
+        return nil
+      else
+        row = table[0]
+        hash = {id: Integer(row[0])}
+      end
     end
   end
 
