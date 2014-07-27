@@ -31,13 +31,14 @@ class Restaurant::Order
     list
   end
 
-  # def update_order_status(status)
-  #   if status != "open" || "closed"
-  #     return nil
-  #   else
-  #     Restaurant.orm.update_order_status(@id,status) #returns boolean
-  #   end
-  # end
+  def update_order_status(status)
+    if status != "open" || "closed"
+      return nil
+    else
+      @status = status
+      Restaurant.orm.update_order_status(@id,@status) #returns boolean
+    end
+  end
 
   def read_order_foods
     result = Restaurant.orm.read_order_foods(@id)

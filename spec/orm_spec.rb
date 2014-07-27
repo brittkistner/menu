@@ -101,7 +101,7 @@ describe 'Orm' do
 
       food_id = Restaurant.orm.create_food("hamburger", 10, "entree")[:id]
 
-      expect(Restaurant.orm.read_shopping_cart_food_quantity(shopping_cart_id,food_id)).to eq(0)
+      expect(Restaurant.orm.read_shopping_cart_food_quantity(shopping_cart_id,food_id)).to be_nil
 
       Restaurant.orm.update_shopping_cart_add_food(shopping_cart_id,food_id,2)
       expect(Restaurant.orm.read_shopping_cart_food_quantity(1,1)[:food_quantity]).to eq(2)
@@ -143,7 +143,7 @@ describe 'Orm' do
       expect(Restaurant.orm.read_shopping_cart_food_quantity(shopping_cart_id,food_id)[:food_quantity]).to eq(2)
 
       Restaurant.orm.update_shopping_cart_remove_food(shopping_cart_id,food_id,3)
-      expect(Restaurant.orm.read_shopping_cart_food_quantity(shopping_cart_id,food_id)).to eq(0)
+      expect(Restaurant.orm.read_shopping_cart_food_quantity(shopping_cart_id,food_id)).to be_nil
     end
 
     it 'removes an item from the shopping cart when the quantity is zero' do
@@ -155,7 +155,7 @@ describe 'Orm' do
       expect(Restaurant.orm.read_shopping_cart_food_quantity(shopping_cart_id,food_id)[:food_quantity]).to eq(2)
 
       Restaurant.orm.update_shopping_cart_remove_food(shopping_cart_id,food_id,2)
-      expect(Restaurant.orm.read_shopping_cart_food_quantity(shopping_cart_id,food_id)).to eq(0)
+      expect(Restaurant.orm.read_shopping_cart_food_quantity(shopping_cart_id,food_id)).to be_nil
     end
 
     describe '#read_shopping_cart_foods' do
@@ -209,7 +209,7 @@ describe 'Orm' do
 
 #### ORDER CLASS ####
   describe '#create_order_delete_shopping_cart' do
-    xit 'creates a new order given a shopping_cart_id and deletes the shopping_cart' do
+    it 'creates a new order given a shopping_cart_id and deletes the shopping_cart' do
       customer_id = Restaurant.orm.create_customer("Benny")[:id]
       shopping_cart_id = Restaurant.orm.update_customer_add_shopping_cart(customer_id)[:id]
       food_id = Restaurant.orm.create_food("hamburger", 10, "entree")[:id]
@@ -220,7 +220,7 @@ describe 'Orm' do
   end
 
   describe '#read_orders_by_status' do
-    xit 'returns an array of orders by id and status' do
+    it 'returns an array of orders by id and status' do
       #order_1
       customer_id1 = Restaurant.orm.create_customer("Benny")[:id]
       shopping_cart_id1 = Restaurant.orm.update_customer_add_shopping_cart(customer_id1)[:id]
