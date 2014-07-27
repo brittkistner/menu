@@ -1,12 +1,16 @@
 <div class="row">
   <div class="large-6 columns menu">
     <ul class="tabs" data-tab>
+      <% for menu in @menus %>
       <li class="tab-title active"><a href="#panel2-1">Breakfast</a></li>
       <li class="tab-title"><a href="#panel2-2">Lunch</a></li>
       <li class="tab-title"><a href="#panel2-3">Dinner</a></li>
+
     </ul>
     <div class="tabs-content">
+      <% for menu in @menus %>
       <div class="content active" id="panel2-1">
+        <% for type in @types[menu] %>
         <h4>Beverages</h5>
         <li><a href="#" data-reveal-id="modalWindow">Menu Item 1</a></li>
         <h4>Scrambles</h4>
@@ -14,6 +18,7 @@
         <h4>Hotcakes</h4>
         <li><a href="#" data-reveal-id="modalWindow">Menu Item 3</a></li>
       </div>
+
       <div class="content" id="panel2-2">
         <h4>Beverages</h4>
         <li><a href="#" data-reveal-id="modalWindow">Menu Item 1</a></li>

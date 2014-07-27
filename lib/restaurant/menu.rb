@@ -31,7 +31,7 @@ class Restaurant::Menu
     result = Restaurant.orm.add_menus_foods(@id,food_id) #returns boolean
   end
 
-  def get_food_from_menu
+  def list_food #(change to return food instances)
     result = Restaurant.orm.read_menu_foods(@id)
 
     list = []

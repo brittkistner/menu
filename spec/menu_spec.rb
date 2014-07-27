@@ -32,12 +32,12 @@ describe 'Restaurant::Menu' do
       lunch.add_food_to_menu(food_1)
       lunch.add_food_to_menu(food_2)
 
-      expect(lunch.get_food_from_menu.length).to eq(2)
-      expect(lunch.get_food_from_menu[0]).to eq(food_1)
+      expect(lunch.list_food.length).to eq(2)
+      expect(lunch.list_food[0][0]).to eq(food_1)
     end
   end
 
-  describe '#get_food_from_menu' do
+  describe '#list_food' do
     it 'retrieves a list of all food ids on a menu' do
       lunch = Restaurant::Menu.create_menu('lunch')
       food_1 = Restaurant::Food.create("Coke", 2, "beverage").id
@@ -46,8 +46,8 @@ describe 'Restaurant::Menu' do
       lunch.add_food_to_menu(food_1)
       lunch.add_food_to_menu(food_2)
 
-      expect(lunch.get_food_from_menu.length).to eq(2)
-      expect(lunch.get_food_from_menu[0]).to eq(food_1)
+      expect(lunch.list_food.length).to eq(2)
+      expect(lunch.list_food[0]).to eq(food_1)
     end
   end
 end

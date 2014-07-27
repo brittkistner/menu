@@ -203,7 +203,7 @@ describe 'Orm' do
       menu_id = Restaurant.orm.create_menu("lunch")[:id]
       food_id = Restaurant.orm.create_food("hamburger", 10, "entree")[:id]
       Restaurant.orm.add_menus_foods(menu_id, food_id)
-      expect(Restaurant.orm.read_menu_foods(menu_id)[0][:id]).to eq(1)
+      expect(Restaurant.orm.read_menu_foods(menu_id)[0][:name]).to eq("hamburger")
     end
   end
 
@@ -241,20 +241,20 @@ describe 'Orm' do
   end
 
   describe '#update_order_status' do
-    xit 'changes the status of an order' do
+    it 'changes the status of an order' do
       customer_id = Restaurant.orm.create_customer("Benny")[:id]
       shopping_cart_id = Restaurant.orm.update_customer_add_shopping_cart(customer_id)[:id]
       food_id = Restaurant.orm.create_food("hamburger", 10, "entree")[:id]
       Restaurant.orm.update_shopping_cart_add_food(shopping_cart_id,food_id,2)
       order_id = Restaurant.orm.create_order_delete_shopping_cart(shopping_cart_id)[:id]
 
-      expect(update_order_status(order_id, "closed")).to eq(true)
+      expect(Restaurant.orm.update_order_status(order_id, "closed")).to eq(true)
       expect(Restaurant.orm.read_orders_by_status[0][:status]).to eq("closed")
     end
   end
 
   describe '#read_order_foods' do
-    xit 'looks up order by id and returns an array of hashes with food ids and food quantities' do
+    it 'looks up order by id and returns an array of hashes with food ids and food quantities' do
       customer_id = Restaurant.orm.create_customer("Fred")[:id]
       shopping_cart_id = Restaurant.orm.update_customer_add_shopping_cart(customer_id)[:id]
       food_id1 = Restaurant.orm.create_food("hamburger", 10, "entree")[:id]
@@ -264,8 +264,8 @@ describe 'Orm' do
 
       order_id = Restaurant.orm.create_order_delete_shopping_cart(shopping_cart_id)[:id]
 
-      expect(read_order_foods(order_id)).to be_a(Array)
-      expect(read_order_foods(order_id)[0][:food_id]).to eq(food_id1)
+      expect(Restaurant.orm.read_order_foods(order_id)).to be_a(Array)
+      expect(Restaurant.orm.read_order_foods(order_id)[0][:food_id]).to eq(food_id1)
     end
   end
 

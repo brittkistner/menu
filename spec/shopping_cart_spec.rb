@@ -62,7 +62,7 @@ describe 'Shopping_Cart' do
       expect(cart.read_shopping_cart_food_quantity(food_id)).to eq(2)
 
       cart.update_shopping_cart_remove_food(food_id,3)
-      expect(cart.read_shopping_cart_food_quantity(food_id)).to eq(0)
+      expect(cart.read_shopping_cart_food_quantity(food_id)).to be_nil
     end
   end
 

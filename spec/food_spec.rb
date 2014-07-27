@@ -23,7 +23,7 @@ describe 'Restaurant::Food' do
     it 'deletes a food item from the food list given a food id' do
       food_instance = Restaurant::Food.create("Coke", 2, "beverage")
       Restaurant::Food.delete_food(food_instance.id)
-      expect(Restaurant::Food.get_all).to be_nil
+      expect(Restaurant::Food.get_all).to eq([])
     end
   end
 

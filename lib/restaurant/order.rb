@@ -32,12 +32,7 @@ class Restaurant::Order
   end
 
   def update_order_status(status)
-    if status != "open" || "closed"
-      return nil
-    else
-      @status = status
-      Restaurant.orm.update_order_status(@id,@status) #returns boolean
-    end
+    Restaurant.orm.update_order_status(@id,status)
   end
 
   def read_order_foods

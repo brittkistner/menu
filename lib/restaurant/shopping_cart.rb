@@ -15,8 +15,8 @@ def update_shopping_cart_remove_food(food_id, quantity)
 
   def read_shopping_cart_food_quantity(food_id)
     result = Restaurant.orm.read_shopping_cart_food_quantity(@id, food_id) #returns food quantity
-    if result == 0
-      0
+    if result.nil?
+      return nil
     else
       result[:food_quantity]
     end

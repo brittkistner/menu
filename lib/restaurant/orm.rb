@@ -32,8 +32,8 @@ module Restaurant
         );
       CREATE TABLE IF NOT EXISTS orders_foods(
         order_id INTEGER REFERENCES orders(id),
-        PRIMARY KEY (order_id),
         food_id INTEGER REFERENCES foods(id),
+        PRIMARY KEY (order_id, food_id),
         food_quantity INTEGER
         );
       CREATE TABLE IF NOT EXISTS shopping_carts(
@@ -44,6 +44,7 @@ module Restaurant
       CREATE TABLE IF NOT EXISTS shopping_cart_foods(
         SCID INTEGER REFERENCES shopping_carts(id),
         food_id INTEGER REFERENCES foods(id),
+        PRIMARY KEY (SCID, food_id),
         food_quantity INTEGER
         );
        CREATE TABLE IF NOT EXISTS menus(
@@ -53,7 +54,8 @@ module Restaurant
         );
        CREATE TABLE IF NOT EXISTS menus_foods(
         menu_id INTEGER REFERENCES menus(id),
-        food_id INTEGER REFERENCES foods(id)
+        food_id INTEGER REFERENCES foods(id),
+        PRIMARY KEY (menu_id, food_id)
         );
        CREATE TABLE IF NOT EXISTS staff(
         id SERIAL,
@@ -386,12 +388,14 @@ module Restaurant
 
     def read_menu_foods(menu_id)
       command = <<-SQL
-      SELECT food_id
-      FROM menus_foods
+      SELECT f.id, f.name, f.price, f.type_of_item
+      FROM menus_foods AS mf
+      JOIN foods AS f
+      ON mf.food_id = f.id
       WHERE menu_id = '#{menu_id}';
       SQL
 
-      table = @db_adaptor.exec(command).values #[['food1'],['food2']]
+      table = @db_adaptor.exec(command).values
 
       if table.empty?
         return []
@@ -399,7 +403,7 @@ module Restaurant
         result = []
 
         table.each do |x|
-          result << {id: Integer(x[0])}
+          result << {id: Integer(x[0]), name: x[1], price: Integer(x[2]), type_of_item: x[3]}
         end
 
         result
