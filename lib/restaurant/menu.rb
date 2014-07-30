@@ -24,14 +24,14 @@ class Restaurant::Menu
       end
     end
 
-    list
+    list #returns a nested array of menu instances
   end
 
   def add_food_to_menu(food_id)
     result = Restaurant.orm.add_menus_foods(@id,food_id) #returns boolean
   end
 
-  def list_food #(change to return food instances)
+  def list_food
     result = Restaurant.orm.read_menu_foods(@id)
 
     list = []
@@ -39,10 +39,10 @@ class Restaurant::Menu
       return nil
     else
       result.each do |x|
-        list << x[:id]
+        list << Restaurant::Food.new(result[:id], result[:price], result[:type_of_item])
       end
     end
 
-    list #return an array of food ids
+    list #return an array of foods
   end
 end
