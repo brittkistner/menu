@@ -6,52 +6,26 @@
         %>
         <li class="tab-title active"><a href="#panel2-"<%= i + 1%>><%= menu_name %></a></li>
       <% end %>
-      <li class="tab-title active"><a href="#panel2-1">Breakfast</a></li>
-      <li class="tab-title active"><a href="#panel2-2">Lunch</a></li>
     </ul>
     <div class="tabs-content">
         <%
-         array = @types_of_item_by_menu.values
-
-         array.each do |nested_array|
-          nested_array.each_with_index do |type_of_item, i|
+        count = 1
+         @types_of_item_by_menu.each do |menu,type_array|
           %>
-         <div class="content active" id="panel2-"<%= i + 1 %>>
-
-          <h4><%=type_of_item%></h4>
-          <li><a href="#" data-reveal-id="modalWindow"><%=food.name %></a></li>
+         <div class="content active" id="panel2-"<%= count %>>
+          <% type_array.each do |type_of_item, food_array| %>
+            <h4><%=type_of_item%></h4>
+            <ul>
+              <% food_array.each do |food| %>
+                <li><a href="#" data-reveal-id="modalWindow"><%=food.name %></a></li> -->
+                <li><a href="#" data-reveal-id="modalWindow"><%=food.price %></a></li> -->
+              <% end %>
+            </ul>
+          <% end %>
         </div>
-          <%end
+        <% count += 1
         end
          %>
-<!--       <div class="content active" id="panel2-1">
-
-        <h4>Beverages</h4>
-        <li><a href="#" data-reveal-id="modalWindow">Menu Item 1</a></li>
-        <h4>Apps</h4>
-        <li><a href="#" data-reveal-id="modalWindow">Menu Item 2</a></li>
-        <h4>Entree</h4>
-        <li><a href="#" data-reveal-id="modalWindow">Menu Item 3</a></li>
-      </div>
-
-      <div class="content" id="panel2-2">
-        <h4>Beverages</h4>
-        <li><a href="#" data-reveal-id="modalWindow">Menu Item 1</a></li>
-        <h4>Appetizers</h4>
-
-        <li><a href="#" data-reveal-id="modalWindow">Menu Item 2</a></li>
-        <h4>Entrees</h4>
-        <li><a href="#" data-reveal-id="modalWindow">Menu Item 3</a></li>
-      </div> -->
-<!--       <div class="content" id="panel2-3">
-        <h4>Beverages</h4>
-        <li><a href="#" data-reveal-id="modalWindow">Menu Item 1</a></li>
-        <h4>Appetizers</h4>
-
-        <li><a href="#" data-reveal-id="modalWindow">Menu Item 2</a></li>
-        <h4>Entrees</h4>
-        <li><a href="#" data-reveal-id="modalWindow">Menu Item 3</a></li>
-      </div> -->
     </div>
   </div>
   <!-- Modal Window -->
